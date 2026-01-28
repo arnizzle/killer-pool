@@ -1,223 +1,150 @@
-let lastPlayerNames = [];
-let editLocked = false;
-
-function renderSelectedPlayers() {
-  const selected = document.getElementById("selected");
-  if (!selected) return;
-
-  selected.innerHTML = "";
-
-  selectedPlayers.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "player selected";
-    div.textContent = p.name;
-
-    if (!editLocked) {
-      const remove = document.createElement("button");
-      remove.className = "remove";
-      remove.textContent = "✕";
-      remove.onclick = () => removePlayer(p.id);
-      div.appendChild(remove);
-    }
-
-    selected.appendChild(div);
-  });
-}
-
 
 async function load() {
   const res = await fetch("/api/state");
-  const data = await res.json();
+  const text = await res.text();
 
-  const playersEl = document.getElementById("players");
-  const currentNames = data.players.map(p => p.name);
-
-  // Detect ADD / REMOVE
-  const added = currentNames.filter(n => !lastPlayerNames.includes(n));
-  const removed = lastPlayerNames.filter(n => !currentNames.includes(n));
-
-  // If no structural change, do NOTHING (prevents flicker)
-  if (added.length === 0 && removed.length === 0) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    console.error("❌ /api/state returned non-JSON:", text);
     return;
   }
 
-  playersEl.innerHTML = "";
-
-  data.players.forEach(p => {
-    const row = document.createElement("div");
-    row.className = "player";
-
-    if (added.includes(p.name)) {
-      row.classList.add("fade-in");
-    }
-
-    const name = document.createElement("span");
-    name.textContent = p.name;
-    row.appendChild(name);
-
-    if (!data.gameStarted) {
-      const remove = document.createElement("button");
-      remove.textContent = "✕";
-
-      remove.onclick = async () => {
-        row.classList.add("fade-out");
-
-        setTimeout(async () => {
-          await fetch("/api/players/remove", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: p.name })
-          });
-
-          load();
-          loadKnownPlayers();
-        }, 180);
-      };
-
-      row.appendChild(remove);
-    }
-
-    playersEl.appendChild(row);
-  });
-
-    // Update selected players UI
-  renderSelectedPlayers();
-
-  
-  lastPlayerNames = currentNames;
-}
-
-async function newGame() {
-  const passwordInput = document.getElementById("adminPassword");
-  const password = passwordInput?.value;
-
-  if (!password) {
-    alert("Enter admin password");
+  if (!Array.isArray(data.players)) {
+    console.error("❌ Invalid /api/state response:", data);
     return;
   }
 
-  const res = await fetch("/api/admin/newgame", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
+  renderSelectedPlayers(data.players);
 
-  if (!res.ok) {
-    alert("Wrong password");
-    return;
-  }
-
-  passwordInput.value = "";
-  await load(); // refresh players + state
-}
-
-async function slotRandomize() {
-  console.log("Slot randomize called ");
-  const res = await fetch(API.slotRandomize, { method: "POST" });
-
-  if (!res.ok) {
-    console.warn("Randomize rejected");
-    return;
-  }
-
-  await loadGameState();
-}
-
-// USE THIS
-async function randomize() {
-  const playersEl = document.getElementById("players");
-
-  // Get REAL state once
-  const res = await fetch("/api/state");
-  const data = await res.json();
-
-  const names = data.players.map(p => p.name);
-  if (names.length < 2) return;
-
-  // Cache original DOM rows & their real names
-  const rows = Array.from(playersEl.children);
-  const originalNames = rows.map(row =>
-    row.querySelector("span").textContent
-  );
-
-  let tick = 0;
-  let delay = 40;
-  const maxTicks = 28;
-
-  function spin() {
-    rows.forEach(row => {
-      const span = row.querySelector("span");
-      span.textContent =
-        names[Math.floor(Math.random() * names.length)];
-    });
-
-    tick++;
-    delay += 12;
-
-    if (tick < maxTicks) {
-      setTimeout(spin, delay);
-    } else {
-      finish();
-    }
-  }
-
-
-
-
-  async function finish() {
-    // Restore original names BEFORE real shuffle
-    rows.forEach((row, i) => {
-      row.querySelector("span").textContent = originalNames[i];
-    });
-
-    await fetch("/api/players/randomize", { method: "POST" });
-
-    // Reload from server (authoritative state)
-    load();
-  }
-
-  spin();
+  document.body.classList.toggle("game-started", data.gameStarted);
 }
 
 
 async function loadKnownPlayers() {
-  const knownEl = document.getElementById("known");
-  const res = await fetch("/api/known");
-  const data = await res.json();
+  const res = await fetch("/api/players/known");
+  const text = await res.text();
 
-  const stateRes = await fetch("/api/state");
-  const state = await stateRes.json();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    console.error("❌ /api/players/known returned non-JSON:", text);
+    return;
+  }
 
-  const selected = new Set(state.players.map(p => p.name));
+  if (!data || !Array.isArray(data.players)) {
+    console.error("❌ Invalid known players response:", data);
+    return;
+  }
 
-  knownEl.innerHTML = "";
+  const container = document.getElementById("known");
+  if (!container) {
+    console.warn("❌ #known container not found");
+    return;
+  }
 
-  data.knownPlayers.forEach(name => {
+  container.innerHTML = "";
+
+  data.players.forEach(p => {
     const div = document.createElement("div");
-    div.className = "known-player";
-    div.textContent = name;
+    div.className = "player known";
 
-    if (selected.has(name)) {
-      div.style.opacity = "0.4";
-    } else {
-      div.onclick = async () => {
-        await fetch("/api/players/select", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name })
-        });
-        load();
-        loadKnownPlayers();
-      };
-    }
+    div.textContent = `${p.emoji || ""} ${p.name}`;
 
-    knownEl.appendChild(div);
+    div.onclick = () => addKnownPlayer(p.id);
+
+    container.appendChild(div);
   });
 }
 
-function startGame() {
-  window.location.href = "/game.html";
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔥 index.js DOM ready → calling load()");
+  load();
+  loadKnownPlayers();
+});
+
+
+async function addKnownPlayer(playerId) {
+  const res = await fetch("/api/players/select", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: playerId })
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Failed to add known player:", text);
+    return;
+  }
+
+  // Refresh selected players
+  load();
 }
 
-load();
-loadKnownPlayers();
+async function removePlayer(playerId) {
+  const res = await fetch("/api/players/remove", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: playerId })
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Failed to remove player:", text);
+    return;
+  }
+
+  // Refresh selected players
+  load();
+}
+
+
+function renderSelectedPlayers(players) {
+  const container = document.getElementById("selected");
+  if (!container) {
+    console.warn("❌ renderSelectedPlayers: #selected not found");
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (!players.length) {
+    container.innerHTML = "<em>No players selected</em>";
+    return;
+  }
+
+  players.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player selected";
+
+    const name = document.createElement("span");
+    name.className = "player-name";
+    name.textContent = `${p.emoji || ""} ${p.name}`;
+
+    const remove = document.createElement("button");
+    remove.className = "remove";
+    remove.textContent = "✕";
+    remove.onclick = () => removePlayer(p.id);
+
+    div.appendChild(name);
+    div.appendChild(remove);
+    container.appendChild(div);
+  });
+}
+
+async function slotRandomize() {
+  const res = await fetch("/api/players/randomize", {
+    method: "POST"
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Randomize failed:", text);
+    return;
+  }
+
+  // Refresh state from server
+  await load();
+}

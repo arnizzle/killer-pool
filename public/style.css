@@ -626,3 +626,21 @@ body.game #players .active {
   60%  { transform: scale(1.05); }
   100% { transform: scale(1); opacity: 1; }
 }
+
+.player.selected {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player .remove {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.player .remove:hover {
+  color: #ff0000;
+}

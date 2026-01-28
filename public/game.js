@@ -24,28 +24,28 @@ async function loadGameState() {
 }
 
 
-/* =========================================================
-   RENDER PLAYERS (NAMES + HEARTS + ELIMINATED)
-========================================================= */
-function renderSelectedPlayers() {
-  selected.innerHTML = "";
+// /* =========================================================
+//    RENDER PLAYERS (NAMES + HEARTS + ELIMINATED)
+// ========================================================= */
+// function renderSelectedPlayers() {
+//   selected.innerHTML = "";
 
-  selectedPlayers.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "player selected";
-    div.textContent = p.name;
+//   selectedPlayers.forEach(p => {
+//     const div = document.createElement("div");
+//     div.className = "player selected";
+//     div.textContent = p.name;
 
-    if (!editLocked) {
-      const remove = document.createElement("button");
-      remove.className = "remove";
-      remove.innerHTML = "✕";
-      remove.onclick = () => removePlayer(p.id);
-      div.appendChild(remove);
-    }
+//     if (!editLocked) {
+//       const remove = document.createElement("button");
+//       remove.className = "remove";
+//       remove.innerHTML = "✕";
+//       remove.onclick = () => removePlayer(p.id);
+//       div.appendChild(remove);
+//     }
 
-    selected.appendChild(div);
-  });
-}
+//     selected.appendChild(div);
+//   });
+// }
 
 function renderPlayers(players) {
   const container = document.getElementById("players");
@@ -238,4 +238,4 @@ function explodeEmojis(emoji) {
 ========================================================= */
 
 pollInterval = setInterval(loadGameState, 1000);
-loadGameState();
+

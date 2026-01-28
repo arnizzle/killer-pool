@@ -1,17 +1,5 @@
-{
-  "knownPlayers": [
-    "😈 Arne",
-    "👷‍♀️ Christine",
-    "🌈 Claire",
-    "👍🏻 Linda",
-    "😼 Pauline",
-    "Paul",
-    "🧚🏻 Ella Bella",
-    "Ralf",
-    "Runa",
-    "💃🏻 Zoran",
-    "Karin",
-    "🐣 Thierry",
-    "Tracy"
-  ]
-}
+[
+  { "id": "1", "name": "Arne", "emoji": "🎱" },
+  { "id": "2", "name": "Christine", "emoji": "👷‍♀️" },
+  { "id": "3", "name": "Ralf", "emoji": "😈" }
+]
