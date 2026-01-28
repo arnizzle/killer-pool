@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="/api.js"></script>
+  <meta charset="UTF-8" />
+  <title>Killer Pool — Game</title>
+
+  <!-- REQUIRED: CSS -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- Mobile sanity -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<!-- REQUIRED: body MUST have class="game" -->
+<body class="game">
+
+  <div class="app">
+    <h1>Killer Pool</h1>
+
+    <!-- PLAYERS -->
+    <section>
+      <h2>Players</h2>
+      <div id="players"></div>
+    </section>
+
+    <!-- CONTROLS -->
+    <div class="controls" id="controls">
+      <button onclick="hit()">HIT</button>
+      <button onclick="miss()">MISS</button>
+    </div>
+  </div>
+
+  <!-- FIREWORKS CANVAS (MUST EXIST, MUST BE LAST IN BODY) -->
+  <canvas id="fireworks"></canvas>
+
+  <!-- REQUIRED: GAME LOGIC -->
+  <script src="/game.js"></script>
+
+</body>
+</html>

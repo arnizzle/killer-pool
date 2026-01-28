@@ -1,0 +1,241 @@
+let pollInterval = null;
+let celebrating = false;
+const slammedPlayers = new Set();
+
+
+/* =========================================================
+   LOAD GAME STATE
+========================================================= */
+
+async function loadGameState() {
+  const res = await fetch("/api/state");
+  const data = await res.json();
+
+  console.log("STATE:", data);
+
+
+  renderPlayers(data.players);
+
+  if (data.gameOver === true && data.winner && !celebrating) {
+    console.log(data.players.name);
+    console.log("🔥 CONDITION MATCHED — STARTING CELEBRATION");
+    startCelebration(data.winner);
+  }
+}
+
+
+/* =========================================================
+   RENDER PLAYERS (NAMES + HEARTS + ELIMINATED)
+========================================================= */
+function renderSelectedPlayers() {
+  selected.innerHTML = "";
+
+  selectedPlayers.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player selected";
+    div.textContent = p.name;
+
+    if (!editLocked) {
+      const remove = document.createElement("button");
+      remove.className = "remove";
+      remove.innerHTML = "✕";
+      remove.onclick = () => removePlayer(p.id);
+      div.appendChild(remove);
+    }
+
+    selected.appendChild(div);
+  });
+}
+
+function renderPlayers(players) {
+  const container = document.getElementById("players");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  players.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player";
+
+    if (p.active) div.classList.add("active");
+    if (p.eliminated) div.classList.add("eliminated");
+
+    // Name + emoji
+    const name = document.createElement("span");
+    name.className = "player-name";
+    name.textContent = `${p.emoji || ""} ${p.name}`;
+
+    // Hearts
+    const hearts = document.createElement("span");
+    hearts.className = "hearts";
+    const remaining = Math.max(0, 3 - (p.misses || 0));
+    hearts.textContent = "❤️".repeat(remaining);
+
+    div.appendChild(name);
+    div.appendChild(hearts);
+
+    // 💀 ELIMINATED SLAM (ONCE PER PLAYER ID)
+    if (p.eliminated && !slammedPlayers.has(p.id)) {
+      const label = document.createElement("div");
+      label.className = "eliminated-label";
+      label.textContent = "ELIMINATED";
+      div.appendChild(label);
+
+      slammedPlayers.add(p.id);
+    }
+
+    container.appendChild(div);
+  });
+}
+
+
+/* =========================================================
+   ACTIONS (HIT / MISS)
+========================================================= */
+
+async function hit() {
+  if (celebrating) return;
+
+  await fetch("/api/action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "hit" })
+  });
+}
+
+async function miss() {
+  if (celebrating) return;
+
+  await fetch("/api/action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "miss" })
+  });
+}
+
+/* =========================================================
+   CELEBRATION (WINNER)
+========================================================= */
+
+function startCelebration(winner) {
+  celebrating = true;
+
+  // stop polling
+  if (pollInterval) clearInterval(pollInterval);
+
+  // hide hit/miss buttons
+  const controls = document.getElementById("controls");
+  if (controls) controls.style.display = "none";
+
+  showWinner(winner);
+  startFireworks();
+  explodeEmojis(winner.emoji || "🎱");
+
+  // back to index after 5s
+  setTimeout(() => {
+    window.location.href = "/";
+  }, 5000);
+}
+
+function showWinner(winner) {
+  const div = document.createElement("div");
+  div.id = "winner";
+  div.textContent = `${winner.emoji || "🏆"} ${winner.name}`;
+  document.body.appendChild(div);
+}
+
+/* =========================================================
+   FIREWORKS
+========================================================= */
+
+function startFireworks() {
+  const canvas = document.getElementById("fireworks");
+  if (!canvas) {
+    console.error("❌ Fireworks canvas not found");
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    console.error("❌ Could not get canvas context");
+    return;
+  }
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+
+  const particles = [];
+
+  function spawnExplosion(x, y) {
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.5) * 14,
+        life: 100
+      });
+    }
+  }
+
+  spawnExplosion(canvas.width / 2, canvas.height / 2);
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life--;
+      ctx.fillStyle = `rgba(0,255,200,${p.life / 100})`;
+      ctx.fillRect(p.x, p.y, 3, 3);
+    });
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      if (particles[i].life <= 0) particles.splice(i, 1);
+    }
+
+    if (celebrating) {
+      if (Math.random() < 0.08) {
+        spawnExplosion(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height * 0.6
+        );
+      }
+      requestAnimationFrame(loop);
+    }
+  }
+
+  loop();
+}
+
+/* =========================================================
+   EMOJI EXPLOSION
+========================================================= */
+
+function explodeEmojis(emoji) {
+  for (let i = 0; i < 100; i++) {
+    const span = document.createElement("span");
+    span.textContent = emoji;
+    span.style.position = "fixed";
+    span.style.left = Math.random() * 100 + "vw";
+    span.style.top = Math.random() * 100 + "vh";
+    span.style.fontSize = 20 + Math.random() * 40 + "px";
+    span.style.animation = "emojiFall 5s linear forwards";
+    document.body.appendChild(span);
+
+    setTimeout(() => span.remove(), 5000);
+  }
+}
+
+/* =========================================================
+   START LOOP
+========================================================= */
+
+pollInterval = setInterval(loadGameState, 1000);
+loadGameState();

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="/api.js"></script>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Killer Pool</title>
+
+  <!-- CYBER STYLES -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <h1>Killer Pool</h1>
+
+    <!-- =====================
+         KNOWN PLAYERS
+    ====================== -->
+    <section>
+      <h2>Known Players</h2>
+      <div id="known"></div>
+    </section>
+
+    <!-- =====================
+         SELECTED PLAYERS
+    ====================== -->
+    <section>
+      <h2>Selected Players</h2>
+      <div id="players"></div>
+    </section>
+
+    <!-- =====================
+         ACTION BUTTONS
+    ====================== -->
+    <div class="actions">
+      <button onclick="randomize()">Randomize</button>
+      <button onclick="startGame()">Start Game</button>
+      <button onclick="newGame()">New Game</button>
+    </div>
+
+    <input
+      id="adminPassword"
+      type="password"
+      placeholder="Admin password"
+      style="margin-top:16px; width:260px; text-align:center;"
+    />
+
+  </div>
+
+  <!-- LOGIC -->
+  <script src="index.js"></script>
+
+</body>
+</html>

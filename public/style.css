@@ -1,0 +1,628 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap");
+
+/* =========================================================
+   RESET / BASE
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: "Orbitron", monospace;
+  background: radial-gradient(circle at top, #0a0f1f, #05070d 70%);
+  color: #9cfffb;
+  min-height: 100vh;
+}
+
+/* =========================================================
+   APP LAYOUT (DEFAULT / INDEX)
+========================================================= */
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;
+}
+
+.app > h1 {
+  grid-column: 1 / -1;
+}
+
+/* =========================================================
+   HEADERS
+========================================================= */
+
+h1 {
+  text-align: center;
+  font-size: 34px;
+  color: #00fff0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 10px rgba(0,255,240,.8),
+    0 0 30px rgba(0,255,240,.4);
+}
+
+h2 {
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #7cf9ff;
+  opacity: .85;
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+#known,
+#players {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(10,20,40,.6);
+  box-shadow:
+    inset 0 0 20px rgba(0,255,255,.06),
+    0 0 20px rgba(0,255,255,.1);
+  overflow-y: auto;
+  max-height: 420px;
+}
+
+/* =========================================================
+   INDEX GRID (KNOWN + SELECTED)
+========================================================= */
+
+#known,
+#players {
+  /* display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px; */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  align-content: start;
+
+}
+
+/* =========================================================
+   PLAYER CHIPS (SHARED)
+========================================================= */
+
+.known-player,
+.player {
+  position: relative;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(0,255,255,.6);
+  background: rgba(0,40,60,.7);
+  color: #00ff99;
+  font-size: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  box-shadow:
+    0 0 6px rgba(0,255,255,.4),
+    inset 0 0 6px rgba(0,255,255,.2);
+}
+
+.known-player:hover {
+  background: rgba(0,255,240,.15);
+}
+
+.known-player[style*="opacity"] {
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+/* =========================================================
+   PLAYER STATES
+========================================================= */
+
+.player.active {
+  background: linear-gradient(135deg,#00ffd5,#00aaff);
+  color: #001018;
+  font-weight: 800;
+  box-shadow:
+    0 0 20px rgba(0,255,220,1);
+}
+
+.player.eliminated {
+  opacity: .25;
+  filter: grayscale(1);
+  text-decoration: line-through;
+  box-shadow: none;
+}
+
+/* =========================================================
+   REMOVE BUTTON
+========================================================= */
+
+.player button {
+  all: unset;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #ff4b4b;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(255,75,75,.9));
+}
+
+/* =========================================================
+   CYBER BUTTONS (GLOBAL)
+========================================================= */
+
+.actions,
+.controls {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.actions button,
+.controls button {
+  width: 220px;
+  height: 90px;
+  font-size: 26px;
+  font-weight: 800;
+  border-radius: 16px;
+  border: 2px solid #00fff0;
+  background: rgba(0,80,120,.85);
+  color: #00fff0;
+  letter-spacing: 2px;
+  cursor: pointer;
+
+  box-shadow:
+    0 0 20px rgba(0,255,240,.9),
+    inset 0 0 20px rgba(0,255,240,.25);
+}
+
+.actions button:hover,
+.controls button:hover {
+  background: #00fff0;
+  color: #001018;
+  box-shadow:
+    0 0 40px rgba(0,255,240,1),
+    0 0 80px rgba(0,255,240,.6);
+}
+
+/* =========================================================
+   ================= GAME PAGE CSS =================
+========================================================= */
+
+/* Game uses single-column layout */
+body.game .app {
+  max-width: 800px;
+  grid-template-columns: 1fr;
+}
+
+/* Game players = vertical list */
+body.game #players {
+  grid-template-columns: 1fr;
+  max-height: none;
+}
+
+/* Emphasize active player more in game */
+body.game .player.active {
+  font-size: 15px;
+  height: 42px;
+  box-shadow:
+    0 0 30px rgba(0,255,220,1),
+    0 0 60px rgba(0,255,220,.6);
+}
+
+/* =========================================================
+   FIREWORKS + WINNER (GAME ONLY)
+========================================================= */
+
+#fireworks {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+#winner {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  font-weight: 800;
+  color: #00ff99;
+  z-index: 50;
+  animation: spinZoom 2s ease-in-out infinite;
+  text-shadow:
+    0 0 20px #00ffcc,
+    0 0 60px #00ffcc;
+}
+
+@keyframes spinZoom {
+  0%   { transform: scale(.6) rotate(0deg); }
+  50%  { transform: scale(1.2) rotate(180deg); }
+  100% { transform: scale(.6) rotate(360deg); }
+}
+
+@keyframes emojiFall {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(200px); }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  #known,
+  #players {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+
+  .actions,
+  .controls {
+    flex-direction: column;
+  }
+
+  .actions button,
+  .controls button {
+    width: 100%;
+    height: 80px;
+  }
+}
+
+.player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-name {
+  flex: 1;
+  text-align: left;
+}
+
+.hearts {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(255,80,80,.8);
+}
+
+.player.eliminated .hearts {
+  opacity: 0;
+}
+
+.player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-name {
+  flex: 1;
+  text-align: left;
+}
+
+.hearts {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(255,80,80,.8);
+}
+
+.player.eliminated .hearts {
+  opacity: 0;
+}
+
+/* =========================
+   ELIMINATED OVERLAY
+========================= */
+
+.player.eliminated {
+  position: relative;
+}
+
+.player.eliminated::after {
+  content: "ELIMINATED";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ff2a2a;
+
+  background: rgba(20, 0, 0, 0.65);
+  border-radius: 18px;
+
+  text-shadow:
+    0 0 10px rgba(255, 0, 0, 0.9),
+    0 0 30px rgba(255, 0, 0, 0.6);
+
+  animation: eliminatedPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes eliminatedPulse {
+  0%   { opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+#winner {
+  pointer-events: none;
+}
+
+.player {
+  position: relative;
+}
+
+.eliminated-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ff2a2a;
+
+  background: rgba(20, 0, 0, 0.75);
+  border-radius: 18px;
+
+  text-shadow:
+    0 0 10px rgba(255, 0, 0, 0.9),
+    0 0 30px rgba(255, 0, 0, 0.6);
+
+  animation: eliminatedPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes eliminatedPulse {
+  0%   { opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================
+   CYBER PASSWORD INPUT
+========================= */
+
+input[type="password"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+
+  font-family: "Orbitron", monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+
+  color: #00fff0;
+  background: rgba(0, 20, 40, 0.85);
+
+  border: 1px solid rgba(0, 255, 240, 0.6);
+  border-radius: 10px;
+
+  outline: none;
+
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 240, 0.25),
+    0 0 10px rgba(0, 255, 240, 0.2);
+
+  transition: 
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+input[type="password"]::placeholder {
+  color: rgba(0, 255, 240, 0.35);
+  letter-spacing: 3px;
+}
+
+/* Focus state */
+input[type="password"]:focus {
+  background: rgba(0, 40, 80, 0.95);
+  border-color: #00fff0;
+
+  box-shadow:
+    inset 0 0 14px rgba(0, 255, 240, 0.5),
+    0 0 25px rgba(0, 255, 240, 0.9);
+}
+
+label {
+  color: #7cf9ff;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* =========================
+   CENTER PASSWORD FIELD
+========================= */
+
+input[type="password"] {
+  display: block;
+  margin: 20px auto;
+  max-width: 320px;
+}
+
+#known,
+#selected {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+
+.player {
+  width: 100%;
+  max-width: 140px;
+  justify-self: start;
+
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.player.selected {
+  flex: unset;
+  width: auto;
+}
+
+/* =========================
+   GAME VIEW – BIG NAMES
+========================= */
+
+body.game #players {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+body.game #players .player,
+body.game #players div {
+  max-width: none;
+  width: 100%;
+
+  padding: 16px 20px;
+  font-size: 26px;
+  line-height: 1.2;
+
+  border-radius: 14px;
+  text-align: left;
+
+  box-sizing: border-box;
+}
+
+body.game #players .active {
+  font-size: 30px;
+  box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
+}
+
+/* =========================
+   ELIMINATED SLAM
+========================= */
+
+.player.eliminated {
+  position: relative;
+  opacity: 0.35;
+  filter: grayscale(100%);
+}
+
+/* Slam text */
+.player.eliminated::after {
+  content: "ELIMINATED";
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: "Orbitron", monospace;
+  font-size: 38px;
+  letter-spacing: 4px;
+  font-weight: 900;
+
+  color: #ff0033;
+  text-shadow:
+    0 0 10px rgba(255, 0, 50, 0.9),
+    0 0 25px rgba(255, 0, 50, 0.8),
+    0 0 50px rgba(255, 0, 50, 0.6);
+
+  transform: scale(4);
+  opacity: 0;
+
+  pointer-events: none;
+  animation: eliminated-slam 0.9s ease-out forwards;
+}
+
+/* Slam animation */
+@keyframes eliminated-slam {
+  0% {
+    transform: scale(4);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Optional shake */
+.player.eliminated {
+  animation: eliminated-shake 0.4s ease-in-out;
+}
+
+@keyframes eliminated-shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* Kill any progress-bar style effects */
+.eliminated-label {
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+}
+
+.eliminated-label::before,
+.eliminated-label::after {
+  content: none !important;
+}
+
+.eliminated-label {
+  animation: slam 0.8s ease-out forwards;
+}
+
+@keyframes slam {
+  0%   { transform: scale(4); opacity: 0; }
+  40%  { transform: scale(1); opacity: 1; }
+  60%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
