@@ -135,16 +135,45 @@ function renderSelectedPlayers(players) {
 }
 
 async function slotRandomize() {
-  const res = await fetch("/api/players/randomize", {
-    method: "POST"
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("❌ Randomize failed:", text);
+  const container = document.getElementById("selected");
+  if (!container) {
+    console.warn("❌ slotRandomize: #selected not found");
     return;
   }
 
-  // Refresh state from server
-  await load();
+  const rows = Array.from(container.children);
+  if (rows.length < 2) return;
+
+  // Capture original names
+  const names = rows.map(r => r.querySelector(".player-name")?.textContent || r.textContent);
+
+  let spins = 15;
+  const interval = setInterval(() => {
+    rows.forEach(row => {
+      const random = names[Math.floor(Math.random() * names.length)];
+      const span = row.querySelector(".player-name") || row;
+      span.textContent = random;
+    });
+
+    spins--;
+    if (spins <= 0) {
+      clearInterval(interval);
+      finishRandomize();
+    }
+  }, 80);
+
+  async function finishRandomize() {
+    const res = await fetch("/api/players/randomize", {
+      method: "POST"
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("❌ Randomize failed:", text);
+      return;
+    }
+
+    // Reload authoritative state
+    await load();
+  }
 }
