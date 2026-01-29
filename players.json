@@ -1,5 +1,12 @@
 [
-  { "id": "1", "name": "Arne", "emoji": "🎱" },
+  { "id": "1", "name": "Arne", "emoji": "😈" },
   { "id": "2", "name": "Christine", "emoji": "👷‍♀️" },
-  { "id": "3", "name": "Ralf", "emoji": "😈" }
+  { "id": "3", "name": "Claire", "emoji": "🌈" },
+  { "id": "4", "name": "Pauline", "emoji": "😼" },
+  { "id": "5", "name": "Ella Bella", "emoji": "🧚🏻 " },
+  { "id": "6", "name": "Runa", "emoji": "😈" },
+  { "id": "7", "name": "Zorha", "emoji": "💃🏻" },
+  { "id": "8", "name": "Thierry", "emoji": "🐣" },
+  { "id": "9", "name": "Ralf", "emoji": "😈" },
+  { "id": "10", "name": "Karin", "emoji": "😈" }
 ]

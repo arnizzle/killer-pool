@@ -11,14 +11,12 @@
   <!-- CYBER STYLES -->
   <link rel="stylesheet" href="style.css" />
 </head>
-<img src="killerpool.png" class="centerimage" width="200" height="133">>
+<img src="killerpool.png" class="centerimage" width="200" height="133">
 <body>
 
 
 
   <div class="app">
-
-    <!-- <h1>Killer Pool</h1> -->
 
     <!-- =====================
          KNOWN PLAYERS
@@ -47,11 +45,17 @@
       <button onclick="startGame()">Start Game</button>
       <button onclick="newGame()">New Game</button>
       
+      <div class="admin-wrap">
+        <input id="adminPassword" class="admin-password" type="password" placeholder="ADMIN ACCESS" />
+      </div>
+      
+  
     </div>
 
-    <input id="adminPassword" type="password" placeholder="Admin password"
-      style="margin-top:16px; width:260px; text-align:center;" />
 
+    <!-- <input id="adminPassword" type="password" placeholder="ADMIN ACCESS" -->
+      <!-- style="margin-top:16px; width:260px; text-align:center;" /> -->
+  
   </div>
 
   <!-- LOGIC -->

@@ -222,6 +222,23 @@ app.get("/api/players/known", (req, res) => {
   res.json({ players: readKnownPlayersFromDisk() });
 });
 
+app.post("/api/players/randomize", (req, res) => {
+  console.log(
+    "BEFORE:",
+    selectedPlayers.map(p => p.name)
+  );
+
+  shuffle(selectedPlayers);
+
+  console.log(
+    "AFTER:",
+    selectedPlayers.map(p => p.name)
+  );
+
+  currentIndex = 0;
+  res.json({ ok: true });
+});
+
 /* ======================
    STATIC FILES
 ====================== */
