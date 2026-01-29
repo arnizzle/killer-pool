@@ -17,10 +17,58 @@ async function load() {
   }
 
   renderSelectedPlayers(data.players);
+  // Pulse Start Game when ready
+  const startBtn = document.querySelector(
+    '.actions button[onclick="startGame()"]'
+  );
+
+  // Lock Randomize when game started
+  const randWrap = document.getElementById("randomizeWrapper");
+
+  if (randWrap) {
+    if (data.gameStarted) {
+      console.log("Locking");
+      randWrap.classList.add("locked");
+    } else {
+      console.log("Locking");
+      randWrap.classList.remove("locked");
+    }
+  }
+
+  if (startBtn) {
+    if (data.players.length >= 2 && !data.gameStarted) {
+      startBtn.classList.add("pulse");
+    } else {
+      startBtn.classList.remove("pulse");
+    }
+  }
 
   document.body.classList.toggle("game-started", data.gameStarted);
 }
 
+async function newGame() {
+  const passwordInput = document.getElementById("adminPassword");
+  const password = passwordInput ? passwordInput.value : "";
+
+  const res = await fetch("/api/admin/newgame", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password })
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ New game failed:", text);
+    alert("Wrong password or request failed");
+    return;
+  }
+
+  // Clear password field
+  if (passwordInput) passwordInput.value = "";
+
+  // Reload state
+  await load();
+}
 
 async function loadKnownPlayers() {
   const res = await fetch("/api/players/known");
@@ -53,7 +101,14 @@ async function loadKnownPlayers() {
 
     div.textContent = `${p.emoji || ""} ${p.name}`;
 
-    div.onclick = () => addKnownPlayer(p.id);
+    div.onclick = () => {
+      const selectedContainer = document.getElementById("selected");
+      if (selectedContainer) {
+        teleportChip(div, selectedContainer);
+      }
+
+      addKnownPlayer(p.id);
+    };
 
     container.appendChild(div);
   });
@@ -133,6 +188,20 @@ function renderSelectedPlayers(players) {
     container.appendChild(div);
   });
 }
+async function startGame() {
+  const res = await fetch("/api/game/start", {
+    method: "POST"
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Start game failed:", text);
+    return;
+  }
+
+  // Go to game screen
+  window.location.href = "/game.html";
+}
 
 async function slotRandomize() {
   const container = document.getElementById("selected");
@@ -176,4 +245,34 @@ async function slotRandomize() {
     // Reload authoritative state
     await load();
   }
+}
+
+function teleportChip(fromEl, toContainer) {
+  const fromRect = fromEl.getBoundingClientRect();
+  const toRect = toContainer.getBoundingClientRect();
+
+  const clone = fromEl.cloneNode(true);
+  clone.classList.add("teleport-clone");
+
+  clone.style.left = `${fromRect.left}px`;
+  clone.style.top = `${fromRect.top}px`;
+  clone.style.width = `${fromRect.width}px`;
+  clone.style.height = `${fromRect.height}px`;
+
+  document.body.appendChild(clone);
+
+  // Force layout
+  clone.getBoundingClientRect();
+
+  // Move to center of target container
+  const targetX =
+    toRect.left + toRect.width / 2 - fromRect.width / 2;
+  const targetY =
+    toRect.top + toRect.height / 2 - fromRect.height / 2;
+
+  clone.style.transform = `translate(${targetX - fromRect.left}px, ${targetY - fromRect.top
+    }px) scale(1.2)`;
+  clone.style.opacity = "0";
+
+  setTimeout(() => clone.remove(), 500);
 }

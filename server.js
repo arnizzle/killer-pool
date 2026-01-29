@@ -117,6 +117,69 @@ app.post("/api/players/remove", (req, res) => {
   res.json({ ok: true });
 });
 
+app.post("/api/action", (req, res) => {
+  if (!gameStarted || gameOver) {
+    return res.status(409).send("Game not active");
+  }
+
+  const { type } = req.body;
+  const player = selectedPlayers[currentIndex];
+
+  if (!player || player.eliminated) {
+    advanceTurn();
+    return res.json({ ok: true });
+  }
+
+  if (type === "miss") {
+    player.misses++;
+    if (player.misses >= 3) {
+      player.eliminated = true;
+    }
+  }
+
+  checkGameOver();
+  if (!gameOver) advanceTurn();
+
+  res.json({ ok: true });
+});
+
+app.post("/api/admin/newgame", (req, res) => {
+  const { password } = req.body;
+  if (password !== adminPassword) {
+    return res.status(403).send("Forbidden");
+  }
+
+  gameStarted = false;
+  gameOver = false;
+  currentIndex = 0;
+  winner = null;
+
+  selectedPlayers.forEach(p => {
+    p.misses = 0;
+    p.eliminated = false;
+  });
+
+  res.json({ ok: true });
+});
+
+app.post("/api/game/start", (req, res) => {
+  if (selectedPlayers.length < 2) {
+    return res.status(400).send("Need at least 2 players");
+  }
+
+  gameStarted = true;
+  gameOver = false;
+  currentIndex = 0;
+  winner = null;
+
+  // Reset player state
+  selectedPlayers.forEach(p => {
+    p.misses = 0;
+    p.eliminated = false;
+  });
+
+  res.json({ ok: true });
+});
 
 app.get("/api/state", (req, res) => {
   res.json({

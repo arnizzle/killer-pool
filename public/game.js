@@ -1,11 +1,38 @@
 let pollInterval = null;
 let celebrating = false;
 const slammedPlayers = new Set();
+const eliminatedAnimated = new Set();
 
 
 /* =========================================================
    LOAD GAME STATE
 ========================================================= */
+
+let emojiRainRunning = false;
+
+function startEmojiRain(emoji = "🎉", duration = 5000) {
+  if (emojiRainRunning) return;
+  emojiRainRunning = true;
+
+  const interval = setInterval(() => {
+    const el = document.createElement("div");
+    el.className = "emoji-rain";
+    el.textContent = emoji;
+
+    el.style.left = Math.random() * 100 + "vw";
+    el.style.fontSize = 1.5 + Math.random() * 2.5 + "rem";
+    el.style.animationDuration = 2.5 + Math.random() * 2 + "s";
+
+    document.body.appendChild(el);
+
+    setTimeout(() => el.remove(), 6000);
+  }, 120);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    emojiRainRunning = false;
+  }, duration);
+}
 
 async function loadGameState() {
   const res = await fetch("/api/state");
@@ -23,29 +50,23 @@ async function loadGameState() {
   }
 }
 
+async function sendAction(type) {
+  console.log("🎯 Action:", type);
 
-// /* =========================================================
-//    RENDER PLAYERS (NAMES + HEARTS + ELIMINATED)
-// ========================================================= */
-// function renderSelectedPlayers() {
-//   selected.innerHTML = "";
+  const res = await fetch("/api/action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type })
+  });
 
-//   selectedPlayers.forEach(p => {
-//     const div = document.createElement("div");
-//     div.className = "player selected";
-//     div.textContent = p.name;
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("❌ Action failed:", text);
+    return;
+  }
 
-//     if (!editLocked) {
-//       const remove = document.createElement("button");
-//       remove.className = "remove";
-//       remove.innerHTML = "✕";
-//       remove.onclick = () => removePlayer(p.id);
-//       div.appendChild(remove);
-//     }
-
-//     selected.appendChild(div);
-//   });
-// }
+  await loadGameState();
+}
 
 function renderPlayers(players) {
   const container = document.getElementById("players");
@@ -74,14 +95,21 @@ function renderPlayers(players) {
     div.appendChild(name);
     div.appendChild(hearts);
 
-    // 💀 ELIMINATED SLAM (ONCE PER PLAYER ID)
-    if (p.eliminated && !slammedPlayers.has(p.id)) {
+    // ELIMINATED overlay (slam once)
+    if (p.eliminated) {
       const label = document.createElement("div");
       label.className = "eliminated-label";
       label.textContent = "ELIMINATED";
       div.appendChild(label);
 
-      slammedPlayers.add(p.id);
+      if (!eliminatedAnimated.has(p.id)) {
+        eliminatedAnimated.add(p.id);
+
+        // Delay so DOM is ready
+        requestAnimationFrame(() => {
+          label.classList.add("animate");
+        });
+      }
     }
 
     container.appendChild(div);
@@ -117,6 +145,14 @@ async function miss() {
    CELEBRATION (WINNER)
 ========================================================= */
 
+function showWinner(winner) {
+  const div = document.createElement("div");
+  div.id = "win";
+  div.textContent = `${winner.emoji || "🏆"} ${winner.name}`;
+  document.body.appendChild(div);
+}
+
+
 function startCelebration(winner) {
   celebrating = true;
 
@@ -129,7 +165,8 @@ function startCelebration(winner) {
 
   showWinner(winner);
   startFireworks();
-  explodeEmojis(winner.emoji || "🎱");
+  startEmojiRain("🎉");
+  
 
   // back to index after 5s
   setTimeout(() => {
@@ -137,12 +174,6 @@ function startCelebration(winner) {
   }, 5000);
 }
 
-function showWinner(winner) {
-  const div = document.createElement("div");
-  div.id = "winner";
-  div.textContent = `${winner.emoji || "🏆"} ${winner.name}`;
-  document.body.appendChild(div);
-}
 
 /* =========================================================
    FIREWORKS

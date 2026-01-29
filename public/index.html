@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <script type="module" src="/api.js"></script>
-  
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Killer Pool</title>
@@ -10,11 +11,14 @@
   <!-- CYBER STYLES -->
   <link rel="stylesheet" href="style.css" />
 </head>
+<img src="killerpool.png" class="centerimage" width="200" height="133">>
 <body>
+
+
 
   <div class="app">
 
-    <h1>Killer Pool</h1>
+    <!-- <h1>Killer Pool</h1> -->
 
     <!-- =====================
          KNOWN PLAYERS
@@ -35,18 +39,18 @@
     <!-- =====================
          ACTION BUTTONS
     ====================== -->
+    
     <div class="actions">
+      <!-- <button onclick="slotRandomize()">Randomize</button> -->
+
       <button onclick="slotRandomize()">Randomize</button>
       <button onclick="startGame()">Start Game</button>
       <button onclick="newGame()">New Game</button>
+      
     </div>
 
-    <input
-      id="adminPassword"
-      type="password"
-      placeholder="Admin password"
-      style="margin-top:16px; width:260px; text-align:center;"
-    />
+    <input id="adminPassword" type="password" placeholder="Admin password"
+      style="margin-top:16px; width:260px; text-align:center;" />
 
   </div>
 
@@ -54,4 +58,5 @@
   <script src="index.js"></script>
 
 </body>
+
 </html>
