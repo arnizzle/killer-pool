@@ -195,6 +195,8 @@ app.get("/api/state", (req, res) => {
 });
 
 app.post("/api/players/select", (req, res) => {
+  console.log("Player selected");
+  
   const { id } = req.body;
 
   const known = readKnownPlayersFromDisk();

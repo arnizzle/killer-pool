@@ -1,3 +1,6 @@
+let teleportPendingId = null;
+let teleportQueue = [];
+
 
 async function load() {
   const res = await fetch("/api/state");
@@ -70,7 +73,26 @@ async function newGame() {
   await load();
 }
 
+function teleportKnownToSelected(playerId) {
+
+  console.log("Teleporting");
+
+  const knownEl = document.querySelector(`#known [data-id="${playerId}"]`);
+  if (!knownEl) return;
+
+  knownEl.classList.add("teleport-out");
+
+  setTimeout(() => {
+    const selectedEl = document.querySelector(`#selected [data-id="${playerId}"]`);
+    if (selectedEl) {
+      selectedEl.classList.add("teleport-in");
+    }
+  }, 350);
+}
+
 async function loadKnownPlayers() {
+  console.log("Loadinging players");
+
   const res = await fetch("/api/players/known");
   const text = await res.text();
 
@@ -104,7 +126,7 @@ async function loadKnownPlayers() {
     div.onclick = () => {
       const selectedContainer = document.getElementById("selected");
       if (selectedContainer) {
-        teleportChip(div, selectedContainer);
+
       }
 
       addKnownPlayer(p.id);
@@ -120,23 +142,75 @@ document.addEventListener("DOMContentLoaded", () => {
   loadKnownPlayers();
 });
 
+function renderKnownPlayers(players) {
+  const container = document.getElementById("known");
+  if (!container) {
+    console.warn("❌ renderKnownPlayers: #known not found");
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (!Array.isArray(players) || players.length === 0) {
+    container.innerHTML = "<em>No known players</em>";
+    return;
+  }
+
+  players.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player known";
+    div.dataset.id = p.id; // REQUIRED for teleport + lookup
+
+    // Name + emoji
+    const name = document.createElement("span");
+    name.className = "player-name";
+    name.textContent = `${p.emoji || ""} ${p.name}`;
+
+    div.appendChild(name);
+
+    // 👇 THIS IS THE MISSING PIECE
+    div.onclick = () => {
+      addKnownPlayer(p.id);
+    };
+
+    container.appendChild(div);
+  });
+}
+
 
 async function addKnownPlayer(playerId) {
-  const res = await fetch("/api/players/select", {
+  teleportQueue.push(playerId);   // 👈 queue it (not overwrite)
+
+  await fetch("/api/players/select", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id: playerId })
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("❌ Failed to add known player:", text);
-    return;
-  }
-
-  // Refresh selected players
-  load();
+  await load();
 }
+
+
+
+
+// FIX
+
+// async function addKnownPlayer(playerId) {
+//   const res = await fetch("/api/players/select", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ id: playerId })
+//   });
+
+//   if (!res.ok) {
+//     const text = await res.text();
+//     console.error("❌ Failed to add known player:", text);
+//     return;
+//   }
+
+//   // Refresh selected players
+//   load();
+// }
 
 async function removePlayer(playerId) {
   const res = await fetch("/api/players/remove", {
@@ -155,7 +229,6 @@ async function removePlayer(playerId) {
   load();
 }
 
-
 function renderSelectedPlayers(players) {
   const container = document.getElementById("selected");
   if (!container) {
@@ -165,19 +238,33 @@ function renderSelectedPlayers(players) {
 
   container.innerHTML = "";
 
-  if (!players.length) {
+  if (!Array.isArray(players) || players.length === 0) {
     container.innerHTML = "<em>No players selected</em>";
     return;
   }
 
-  players.forEach(p => {
+  players.forEach((p, index) => {
     const div = document.createElement("div");
     div.className = "player selected";
+    div.dataset.id = p.id;
 
+    // BURST TELEPORT
+    const queueIndex = teleportQueue.indexOf(p.id);
+    if (queueIndex !== -1) {
+      div.style.animationDelay = `${queueIndex * 80}ms`; // stagger
+      div.classList.add("teleport-in");
+    }
+
+    // Clear queue AFTER rendering
+    teleportQueue = [];
+
+
+    // Name + emoji
     const name = document.createElement("span");
     name.className = "player-name";
     name.textContent = `${p.emoji || ""} ${p.name}`;
 
+    // Remove button (only if game not started)
     const remove = document.createElement("button");
     remove.className = "remove";
     remove.textContent = "✕";
@@ -188,6 +275,41 @@ function renderSelectedPlayers(players) {
     container.appendChild(div);
   });
 }
+
+
+// function renderSelectedPlayers(players) {
+//   const container = document.getElementById("selected");
+//   if (!container) {
+//     console.warn("❌ renderSelectedPlayers: #selected not found");
+//     return;
+//   }
+
+//   container.innerHTML = "";
+
+//   if (!players.length) {
+//     container.innerHTML = "<em>No players selected</em>";
+//     return;
+//   }
+
+//   players.forEach(p => {
+//     const div = document.createElement("div");
+//     div.className = "player selected";
+
+//     const name = document.createElement("span");
+//     name.className = "player-name";
+//     name.textContent = `${p.emoji || ""} ${p.name}`;
+
+//     const remove = document.createElement("button");
+//     remove.className = "remove";
+//     remove.textContent = "✕";
+//     remove.onclick = () => removePlayer(p.id);
+
+//     div.appendChild(name);
+//     div.appendChild(remove);
+//     container.appendChild(div);
+//   });
+// }
+
 async function startGame() {
   const res = await fetch("/api/game/start", {
     method: "POST"
@@ -247,32 +369,34 @@ async function slotRandomize() {
   }
 }
 
-function teleportChip(fromEl, toContainer) {
-  const fromRect = fromEl.getBoundingClientRect();
-  const toRect = toContainer.getBoundingClientRect();
+// function teleportChip(fromEl, toContainer) {
+//   console.log("Chip");
 
-  const clone = fromEl.cloneNode(true);
-  clone.classList.add("teleport-clone");
+//   const fromRect = fromEl.getBoundingClientRect();
+//   const toRect = toContainer.getBoundingClientRect();
 
-  clone.style.left = `${fromRect.left}px`;
-  clone.style.top = `${fromRect.top}px`;
-  clone.style.width = `${fromRect.width}px`;
-  clone.style.height = `${fromRect.height}px`;
+//   const clone = fromEl.cloneNode(true);
+//   clone.classList.add("teleport-clone");
 
-  document.body.appendChild(clone);
+//   clone.style.left = `${fromRect.left}px`;
+//   clone.style.top = `${fromRect.top}px`;
+//   clone.style.width = `${fromRect.width}px`;
+//   clone.style.height = `${fromRect.height}px`;
 
-  // Force layout
-  clone.getBoundingClientRect();
+//   document.body.appendChild(clone);
 
-  // Move to center of target container
-  const targetX =
-    toRect.left + toRect.width / 2 - fromRect.width / 2;
-  const targetY =
-    toRect.top + toRect.height / 2 - fromRect.height / 2;
+//   // Force layout
+//   clone.getBoundingClientRect();
 
-  clone.style.transform = `translate(${targetX - fromRect.left}px, ${targetY - fromRect.top
-    }px) scale(1.2)`;
-  clone.style.opacity = "0";
+//   // Move to center of target container
+//   const targetX =
+//     toRect.left + toRect.width / 2 - fromRect.width / 2;
+//   const targetY =
+//     toRect.top + toRect.height / 2 - fromRect.height / 2;
 
-  setTimeout(() => clone.remove(), 500);
-}
+//   clone.style.transform = `translate(${targetX - fromRect.left}px, ${targetY - fromRect.top
+//     }px) scale(1.2)`;
+//   clone.style.opacity = "0";
+
+//   setTimeout(() => clone.remove(), 500);
+// }

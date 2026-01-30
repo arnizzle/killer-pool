@@ -17,32 +17,20 @@
 
 <body class="game">
   <canvas id="fireworks"></canvas>
+
   <div class="app">
     <h1>Killer Pool</h1>
 
-    <!-- PLAYERS -->
-    <div class="game">
-      <div id="players"></div>
+    <div id="players"></div>
 
-      <div class="actions">
-        <button id="hitBtn" onclick="sendAction('hit')">HIT</button>
-        <button id="missBtn" onclick="sendAction('miss')">MISS</button>
-      </div>
+    <div class="actions">
+      <button id="hitBtn" onclick="sendAction('hit')">HIT</button>
+      <button id="missBtn" onclick="sendAction('miss')">MISS</button>
     </div>
-
-    <!-- <section>
-    <h2>Selected Players</h2>
-      <div id="selectedPlayers"></div>
-    </section> -->
-
   </div>
 
-  <!-- FIREWORKS CANVAS (MUST EXIST, MUST BE LAST IN BODY) -->
-  
-
-  <!-- REQUIRED: GAME LOGIC -->
   <script src="/game.js"></script>
-
 </body>
+
 
 </html>

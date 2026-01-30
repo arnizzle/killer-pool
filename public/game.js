@@ -38,9 +38,6 @@ async function loadGameState() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
-  console.log("STATE:", data);
-
-
   renderPlayers(data.players);
 
   if (data.gameOver === true && data.winner && !celebrating) {
@@ -70,13 +67,19 @@ async function sendAction(type) {
 
 function renderPlayers(players) {
   const container = document.getElementById("players");
-  if (!container) return;
+  if (!container) {
+    console.warn("❌ renderPlayers: #players not found");
+    return;
+  }
 
   container.innerHTML = "";
+
+  if (!Array.isArray(players)) return;
 
   players.forEach(p => {
     const div = document.createElement("div");
     div.className = "player";
+    div.dataset.id = p.id;
 
     if (p.active) div.classList.add("active");
     if (p.eliminated) div.classList.add("eliminated");
@@ -86,7 +89,7 @@ function renderPlayers(players) {
     name.className = "player-name";
     name.textContent = `${p.emoji || ""} ${p.name}`;
 
-    // Hearts
+    // Hearts (3 lives)
     const hearts = document.createElement("span");
     hearts.className = "hearts";
     const remaining = Math.max(0, 3 - (p.misses || 0));
@@ -95,7 +98,7 @@ function renderPlayers(players) {
     div.appendChild(name);
     div.appendChild(hearts);
 
-    // ELIMINATED overlay (slam once)
+    // ELIMINATED overlay (play ONCE)
     if (p.eliminated) {
       const label = document.createElement("div");
       label.className = "eliminated-label";
@@ -104,8 +107,6 @@ function renderPlayers(players) {
 
       if (!eliminatedAnimated.has(p.id)) {
         eliminatedAnimated.add(p.id);
-
-        // Delay so DOM is ready
         requestAnimationFrame(() => {
           label.classList.add("animate");
         });
