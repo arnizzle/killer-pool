@@ -224,17 +224,37 @@ body.game {
    FIREWORKS & EMOJI
 ========================= */
 
+.emoji-rain {
+  position: fixed;
+  top: -5vh;
+  pointer-events: none;
+  z-index: 9999;
+
+  animation-name: emojiFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes emojiFall {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(
+      calc(-50px + 100px * var(--drift, 0.5)),
+      110vh
+    );
+    opacity: 0.9;
+  }
+}
+
+
 #fireworks {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-}
-
-.emoji-rain {
-  position: fixed;
-  top: -50px;
-  pointer-events: none;
 }
 
 /* =========================
@@ -379,4 +399,19 @@ body.game {
   gap: 16px;
   position: relative; /* important if players are positioned */
   z-index: 2;
+}
+
+body.game .click-hint {
+  position: fixed;
+  bottom: 24px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.7;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }

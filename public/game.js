@@ -27,11 +27,11 @@ function startEmojiRain(emoji = "🎉", duration = 5000) {
 
     setTimeout(() => el.remove(), 6000);
   }, 120);
-
-  setTimeout(() => {
+  return () => {
     clearInterval(interval);
     emojiRainRunning = false;
-  }, duration);
+  };
+
 }
 
 async function loadGameState() {
@@ -155,9 +155,13 @@ function showWinner(winner) {
   document.body.appendChild(div);
 }
 
-
 function startCelebration(winner) {
   celebrating = true;
+
+  const hint = document.createElement("div");
+  hint.textContent = "Click anywhere to continue";
+  hint.className = "click-hint";
+  document.body.appendChild(hint);
 
   // stop polling
   if (pollInterval) clearInterval(pollInterval);
@@ -166,15 +170,21 @@ function startCelebration(winner) {
   const controls = document.getElementById("controls");
   if (controls) controls.style.display = "none";
 
-  showWinner(winner);
   startFireworks();
-  startEmojiRain("🎉");
-  
+  const stopEmojiRain = startEmojiRain("🎉");
 
-  // back to index after 5s
-  setTimeout(() => {
+  function endCelebration() {
+    celebrating = false;
+    stopEmojiRain();
     window.location.href = "/";
-  }, 5000);
+  }
+
+  document.addEventListener(
+    "click",
+    endCelebration,
+    { once: true }
+  );
+
 }
 
 
@@ -261,6 +271,9 @@ function explodeEmojis(emoji) {
     span.style.top = Math.random() * 100 + "vh";
     span.style.fontSize = 20 + Math.random() * 40 + "px";
     span.style.animation = "emojiFall 5s linear forwards";
+
+    el.style.setProperty("--drift", Math.random());
+
     document.body.appendChild(span);
 
     setTimeout(() => span.remove(), 5000);

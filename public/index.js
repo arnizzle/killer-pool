@@ -49,6 +49,11 @@ async function load() {
   document.body.classList.toggle("game-started", data.gameStarted);
 }
 
+const hint = document.createElement("div");
+hint.textContent = "Click anywhere to continue";
+hint.className = "click-hint";
+document.body.appendChild(hint);
+
 async function newGame() {
   const passwordInput = document.getElementById("adminPassword");
   const password = passwordInput ? passwordInput.value : "";
