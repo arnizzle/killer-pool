@@ -2,9 +2,12 @@ const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
-
 const app = express();
+
 app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+app.use("/public/", express.static(path.join(__dirname, "assets")));
+
 
 /* ======================
    STATE

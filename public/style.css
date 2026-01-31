@@ -415,3 +415,32 @@ body.game .click-hint {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
+
+body.game {
+  position: relative;
+  background: #000; /* fallback */
+  overflow: hidden;
+}
+
+/* Scary pool-table background */
+body.game::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/assets/pool-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0.8;
+  filter: contrast(1.1) saturate(0.8) brightness(0.8);
+
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.game .app,
+#fireworks {
+  position: relative;
+  z-index: 1;
+}
