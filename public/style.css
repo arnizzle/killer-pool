@@ -365,3 +365,18 @@ body.game {
     transform: scale(1);
   }
 }
+
+#players {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  position: relative; /* important if players are positioned */
+  z-index: 2;
+}

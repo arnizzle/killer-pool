@@ -270,6 +270,8 @@ function explodeEmojis(emoji) {
 /* =========================================================
    START LOOP
 ========================================================= */
+// Load immediately so players appear instantly
+loadGameState();
 
+// Then keep polling
 pollInterval = setInterval(loadGameState, 1000);
-
