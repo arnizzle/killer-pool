@@ -238,6 +238,43 @@ function renderSelectedPlayers(players) {
 
   container.innerHTML = "";
 
+  if (!players.length) {
+    container.innerHTML = "<em>No players selected</em>";
+    teleportQueue.length = 0;
+    return;
+  }
+
+  const teleportSnapshot = [...teleportQueue];
+
+  players.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player selected";
+    div.dataset.id = p.id;
+
+    const idx = teleportSnapshot.indexOf(p.id);
+    if (idx !== -1) {
+      div.style.animationDelay = `${idx * 90}ms`;
+      div.classList.add("teleport-in");
+    }
+
+    const name = document.createElement("span");
+    name.className = "player-name";
+    name.textContent = `${p.emoji || ""} ${p.name}`;
+
+    const remove = document.createElement("button");
+    remove.className = "remove";
+    remove.textContent = "✕";
+    remove.onclick = () => removePlayer(p.id);
+
+    div.appendChild(name);
+    div.appendChild(remove);
+    container.appendChild(div);
+  });
+
+  teleportQueue.length = 0; // ✅ clear AFTER render
+
+  container.innerHTML = "";
+
   if (!Array.isArray(players) || players.length === 0) {
     container.innerHTML = "<em>No players selected</em>";
     return;
@@ -249,14 +286,15 @@ function renderSelectedPlayers(players) {
     div.dataset.id = p.id;
 
     // BURST TELEPORT
-    const queueIndex = teleportQueue.indexOf(p.id);
-    if (queueIndex !== -1) {
-      div.style.animationDelay = `${queueIndex * 80}ms`; // stagger
+    const idx = teleportSnapshot.indexOf(p.id);
+    if (idx !== -1) {
+      div.style.animationDelay = `${idx * 90}ms`;
       div.classList.add("teleport-in");
     }
 
     // Clear queue AFTER rendering
     teleportQueue = [];
+    teleportQueue.length = 0;
 
 
     // Name + emoji
