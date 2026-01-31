@@ -100,20 +100,31 @@ function renderPlayers(players) {
 
     // ELIMINATED overlay (play ONCE)
     if (p.eliminated) {
-      div.classList.add("crack");
+      // If we've already animated this player, render static eliminated state
+      if (eliminatedAnimated.has(p.id)) {
+        div.classList.add("eliminated");
 
-      const label = document.createElement("div");
-      label.className = "eliminated-label";
-      label.textContent = "ELIMINATED";
-      div.appendChild(label);
-
-      if (!eliminatedAnimated.has(p.id)) {
+        const label = document.createElement("div");
+        label.className = "eliminated-label";
+        label.textContent = "ELIMINATED";
+        div.appendChild(label);
+      } else {
+        // First-time elimination animation
         eliminatedAnimated.add(p.id);
+
+        div.classList.add("crack");
+
+        const label = document.createElement("div");
+        label.className = "eliminated-label";
+        label.textContent = "ELIMINATED";
+        div.appendChild(label);
+
         requestAnimationFrame(() => {
           label.classList.add("animate");
         });
       }
     }
+
 
     container.appendChild(div);
   });
