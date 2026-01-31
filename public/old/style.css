@@ -790,3 +790,14 @@ body.game {
   flex-direction: column;
   align-items: center;
 }
+
+/* =========================
+   CURRENT PLAYER (API-DRIVEN)
+========================= */
+
+#players .player.current-player {
+  border: 3px solid hotpink;
+  box-shadow:
+    0 0 12px hotpink,
+    0 0 28px rgba(255, 105, 180, 0.9);
+}

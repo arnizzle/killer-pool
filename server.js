@@ -8,7 +8,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 app.use("/public/", express.static(path.join(__dirname, "assets")));
 
-
 /* ======================
    STATE
 ====================== */
@@ -21,6 +20,10 @@ let gameOver = false;
 
 const KNOWN_PLAYERS_FILE = "./players.json";
 
+/* ======================
+   LOAD KNOWN PLAYERS
+====================== */
+
 function readKnownPlayersFromDisk() {
   try {
     if (!fs.existsSync(KNOWN_PLAYERS_FILE)) {
@@ -31,17 +34,16 @@ function readKnownPlayersFromDisk() {
     const data = JSON.parse(raw);
 
     if (!Array.isArray(data)) {
-      console.warn("⚠️ knownPlayers.json is not an array");
+      console.warn("⚠️ players.json is not an array");
       return [];
     }
 
     return data;
   } catch (err) {
-    console.error("❌ Failed to read known players:", err);
+    console.error("❌ Failed to read players:", err);
     return [];
   }
 }
-
 
 /* ======================
    PASSWORD
@@ -75,6 +77,12 @@ function aliveCount() {
   return alivePlayers().length;
 }
 
+function getCurrentPlayerId() {
+  if (gameOver) return null;
+  const player = selectedPlayers[currentIndex];
+  return player ? player.id : null;
+}
+
 function checkGameOver() {
   const alive = alivePlayers();
 
@@ -101,18 +109,14 @@ function advanceTurn() {
 }
 
 /* ======================
-   API ROUTES (FIRST)
+   API ROUTES
 ====================== */
 
-/* ======================
-   API ROUTES — MUST BE FIRST
-====================== */
 app.post("/api/players/remove", (req, res) => {
   const { id } = req.body;
 
   selectedPlayers = selectedPlayers.filter(p => p.id !== id);
 
-  // keep currentIndex sane
   if (currentIndex >= selectedPlayers.length) {
     currentIndex = 0;
   }
@@ -175,7 +179,6 @@ app.post("/api/game/start", (req, res) => {
   currentIndex = 0;
   winner = null;
 
-  // Reset player state
   selectedPlayers.forEach(p => {
     p.misses = 0;
     p.eliminated = false;
@@ -184,22 +187,30 @@ app.post("/api/game/start", (req, res) => {
   res.json({ ok: true });
 });
 
+/* ======================
+   API STATE (MODIFIED)
+====================== */
+
 app.get("/api/state", (req, res) => {
   res.json({
     players: selectedPlayers,
     gameStarted,
     gameOver,
+
+    // EXISTING FIELD (unchanged)
     currentPlayer:
       selectedPlayers[currentIndex] && !gameOver
         ? selectedPlayers[currentIndex].name
         : null,
+
+    // ✅ ADDED FIELD
+    currentPlayerId: getCurrentPlayerId(),
+
     winner: winner ? winner.name : null
   });
 });
 
 app.post("/api/players/select", (req, res) => {
-  console.log("Player selected");
-  
   const { id } = req.body;
 
   const known = readKnownPlayersFromDisk();
@@ -222,24 +233,12 @@ app.post("/api/players/select", (req, res) => {
   res.json({ ok: true });
 });
 
-
 app.get("/api/players/known", (req, res) => {
   res.json({ players: readKnownPlayersFromDisk() });
 });
 
 app.post("/api/players/randomize", (req, res) => {
-  console.log(
-    "BEFORE:",
-    selectedPlayers.map(p => p.name)
-  );
-
   shuffle(selectedPlayers);
-
-  console.log(
-    "AFTER:",
-    selectedPlayers.map(p => p.name)
-  );
-
   currentIndex = 0;
   res.json({ ok: true });
 });
@@ -250,27 +249,12 @@ app.post("/api/players/randomize", (req, res) => {
 
 app.use(express.static("public"));
 
-/* ======================
-   SPA FALLBACK — LAST
-====================== */
-
 app.use((req, res) => {
   res.sendFile(path.resolve("public/index.html"));
 });
 
 /* ======================
-   STATIC FILES (LAST)
-====================== */
-
-app.use(express.static("public"));
-
-app.use((req, res) => {
-  res.sendFile(path.resolve("public/index.html"));
-});
-
-
-/* ======================
-   START
+   START SERVER
 ====================== */
 
 app.listen(3000, () => {

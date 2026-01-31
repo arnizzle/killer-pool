@@ -1,7 +1,12 @@
-let pollInterval = null;
-let celebrating = false;
 const slammedPlayers = new Set();
 const eliminatedAnimated = new Set();
+const eliminationQueue = [];
+
+let pollInterval = null;
+let celebrating = false;
+let finalEliminationPause = false;
+let eliminationPlaying = false;
+let currentPlayerId = null;
 
 
 /* =========================================================
@@ -34,15 +39,66 @@ function startEmojiRain(emoji = "🎉", duration = 5000) {
 
 }
 
+async function playNextElimination() {
+  if (eliminationPlaying) return;
+  if (eliminationQueue.length === 0) return;
+
+  eliminationPlaying = true;
+
+  const player = eliminationQueue.shift();
+  eliminatedAnimated.add(player.id);
+
+  // Force re-render so crack animation applies
+  renderPlayers(lastKnownPlayers);
+
+  // Dramatic pause
+  await new Promise(res => setTimeout(res, 900));
+
+  eliminationPlaying = false;
+
+  // Chain the next one
+  playNextElimination();
+}
+
 async function loadGameState() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
-  renderPlayers(data.players);
+  // 🔥 THIS WAS MISSING
+  currentPlayerId = data.currentPlayerId;
 
+  lastKnownPlayers = data.players;
+  renderPlayers(data.players);
+  playNextElimination();
+
+  const alivePlayers = data.players.filter(
+    p => !p.eliminated
+  );
+
+  // FINAL ELIMINATION PAUSE
+  if (
+    alivePlayers.length === 1 &&
+    !finalEliminationPause &&
+    !celebrating &&
+    eliminationQueue.length > 0
+  ) {
+    finalEliminationPause = true;
+
+    // Stop polling temporarily
+    if (pollInterval) clearInterval(pollInterval);
+
+    console.log("⏸ Final elimination pause…");
+
+    setTimeout(() => {
+      console.log("▶ Resuming for winner");
+      startCelebration(alivePlayers[0]);
+    }, 5000);
+
+    return;
+  }
+
+  // Normal game-over path (non-final cases)
   if (data.gameOver === true && data.winner && !celebrating) {
-    console.log(data.players.name);
-    console.log("🔥 CONDITION MATCHED — STARTING CELEBRATION");
     startCelebration(data.winner);
   }
 }
@@ -80,9 +136,23 @@ function renderPlayers(players) {
     const div = document.createElement("div");
     div.className = "player";
     div.dataset.id = p.id;
+    div.dataset.misses = p.misses;
+
 
     if (p.active) div.classList.add("active");
+    
+    if (String(p.id) === String(currentPlayerId)) {
+      div.classList.add("current-player");
+    }
+    console.log("CURRENT PLAYER ID:", currentPlayerId);
+
+
     if (p.eliminated) div.classList.add("eliminated");
+
+    // FORCE first non-eliminated player active (debug)
+    if (!players.some(pl => pl.active) && !p.eliminated) {
+      div.classList.add("active");
+    }
 
     // Name + emoji
     const name = document.createElement("span");
