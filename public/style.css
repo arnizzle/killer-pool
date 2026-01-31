@@ -321,3 +321,47 @@ body.game {
     filter: brightness(1);
   }
 }
+
+/* =========================
+   CRACKED GLASS OVERLAY
+========================= */
+
+.player.eliminated::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 2%, transparent 3%),
+    radial-gradient(circle at 70% 40%, rgba(255,255,255,0.8) 2%, transparent 3%),
+    linear-gradient(25deg, transparent 48%, rgba(255,255,255,0.35) 50%, transparent 52%),
+    linear-gradient(-35deg, transparent 47%, rgba(255,255,255,0.3) 49%, transparent 51%),
+    linear-gradient(65deg, transparent 46%, rgba(255,255,255,0.25) 48%, transparent 50%),
+    linear-gradient(-75deg, transparent 45%, rgba(255,255,255,0.2) 47%, transparent 49%);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transform: scale(1.2);
+}
+
+.player.eliminated.crack::after {
+  animation: crackFlash 480ms ease-out forwards;
+}
+
+@keyframes crackFlash {
+  0% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+}

@@ -100,6 +100,8 @@ function renderPlayers(players) {
 
     // ELIMINATED overlay (play ONCE)
     if (p.eliminated) {
+      div.classList.add("crack");
+
       const label = document.createElement("div");
       label.className = "eliminated-label";
       label.textContent = "ELIMINATED";
