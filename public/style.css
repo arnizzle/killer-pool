@@ -724,3 +724,16 @@ body.game.final-death-pulse::after {
     opacity: 0;
   }
 }
+
+/* =========================
+   CELEBRATION — BACKGROUND BOOST
+========================= */
+
+body.game.celebrating::before {
+  opacity: 0.5 !important; /* was ~0.8 before */
+  filter: contrast(1.15) saturate(1.1) brightness(1.05);
+}
+
+body.game.celebrating .app {
+  transform: scale(0.98);
+}

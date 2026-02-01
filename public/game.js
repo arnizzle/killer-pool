@@ -271,6 +271,8 @@ function showWinner(winner) {
 }
 
 function startCelebration(winner) {
+  document.body.classList.add("celebrating");
+
   celebrating = true;
 
   const hint = document.createElement("div");
