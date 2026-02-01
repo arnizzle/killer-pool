@@ -26,7 +26,7 @@ function startEmojiRain(emoji = "🎉", duration = 5000) {
 
     el.style.left = Math.random() * 100 + "vw";
     el.style.fontSize = 1.5 + Math.random() * 2.5 + "rem";
-    // el.style.animationDuration = 2.5 + Math.random() * 2 + "s";
+    el.style.animationDuration = 2.5 + Math.random() * 2 + "s";
 
     document.body.appendChild(el);
 
@@ -64,44 +64,76 @@ async function loadGameState() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
-  // 🔥 THIS WAS MISSING
+  // Update current player
   currentPlayerId = data.currentPlayerId;
 
+  // Store + render players
   lastKnownPlayers = data.players;
   renderPlayers(data.players);
+
+  // Play queued eliminations (if any)
   playNextElimination();
 
-  const alivePlayers = data.players.filter(
-    p => !p.eliminated
-  );
+  const alivePlayers = data.players.filter(p => !p.eliminated);
 
-  // FINAL ELIMINATION PAUSE
+  /* ---------------------------------
+     FINAL ELIMINATION → CELEBRATION
+  --------------------------------- */
   if (
     alivePlayers.length === 1 &&
     !finalEliminationPause &&
-    !celebrating &&
-    eliminationQueue.length > 0
+    !celebrating
   ) {
     finalEliminationPause = true;
+    celebrating = true; // 🔒 hard lock to prevent double-fire
 
-    // Stop polling temporarily
-    if (pollInterval) clearInterval(pollInterval);
+    // Stop polling so nothing interrupts celebration
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+
+    console.log("💀 Final death pulse");
+    document.body.classList.add("shake"); /// CHECK THIS
+
+    // 🔴 RED SCREEN PULSE (ONCE)
+    document.body.classList.add("final-death-pulse");
+
+    // Clean up class after animation so it can never replay
+    setTimeout(() => {
+      document.body.classList.remove("final-death-pulse");
+    }, 1300);
 
     console.log("⏸ Final elimination pause…");
 
     setTimeout(() => {
-      console.log("▶ Resuming for winner");
+      console.log("🎉 Starting winner celebration");
       startCelebration(alivePlayers[0]);
-    }, 5000);
+    }, 1000);
 
     return;
   }
 
-  // Normal game-over path (non-final cases)
-  if (data.gameOver === true && data.winner && !celebrating) {
+  /* ---------------------------------
+     NON-FINAL GAME OVER (SAFETY NET)
+  --------------------------------- */
+  if (
+    data.gameOver === true &&
+    data.winner &&
+    !celebrating
+  ) {
+    celebrating = true;
+
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+
+    console.log("🎉 Game over celebration");
     startCelebration(data.winner);
   }
 }
+
 
 async function sendAction(type) {
   console.log("🎯 Action:", type);
@@ -120,6 +152,15 @@ async function sendAction(type) {
 
   await loadGameState();
 }
+
+function checkGameOverAfterAnimation() {
+  if (!window.pendingGameOverState) return;
+
+  // apply game-over UI ONLY after animation
+  handleGameOver(window.pendingGameOverState);
+  window.pendingGameOverState = null;
+}
+
 
 function renderPlayers(players) {
   const container = document.getElementById("players");
@@ -172,21 +213,23 @@ function renderPlayers(players) {
       label.textContent = "ELIMINATED";
       div.appendChild(label);
 
-      // 🔥 Animate ONLY on first transition
+      // 🔥 ALWAYS allow animation if not yet animated
       if (!eliminatedAnimated.has(player.id)) {
         eliminatedAnimated.add(player.id);
         div.classList.add("eliminating");
 
-        // After animation → permanent state
         setTimeout(() => {
           div.classList.remove("eliminating");
           div.classList.add("eliminated");
+
+          // 🧠 IMPORTANT: only now allow game-over UI
+          checkGameOverAfterAnimation();
         }, 1300);
       } else {
-        // 🧊 Static forever
         div.classList.add("eliminated");
       }
     }
+
 
     container.appendChild(div);
   });
@@ -241,6 +284,16 @@ function startCelebration(winner) {
   // hide hit/miss buttons
   const controls = document.getElementById("controls");
   if (controls) controls.style.display = "none";
+
+  const banner = document.createElement("div");
+  banner.id = "winner-banner";
+
+  const name = document.createElement("span");
+  name.className = "winner-name";
+  name.textContent = winner.name;
+
+  banner.appendChild(name);
+  document.body.appendChild(banner);
 
   startFireworks();
   const stopEmojiRain = startEmojiRain("🎉");

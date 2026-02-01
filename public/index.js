@@ -1,6 +1,14 @@
 let teleportPendingId = null;
 let teleportQueue = [];
 
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 async function load() {
   const res = await fetch("/api/state");
@@ -290,78 +298,125 @@ async function startGame() {
   window.location.href = "/game.html";
 }
 
-async function slotRandomize() {
-  const container = document.getElementById("selected");
-  if (!container) {
-    console.warn("❌ slotRandomize: #selected not found");
-    return;
-  }
+function flashFinalPlayers() {
+  const players = document.querySelectorAll("#selected .player");
 
-  const rows = Array.from(container.children);
-  if (rows.length < 2) return;
+  players.forEach((player, index) => {
+    setTimeout(() => {
+      player.classList.add("final-reel-flash");
 
-  // Capture original names
-  const names = rows.map(r => r.querySelector(".player-name")?.textContent || r.textContent);
-
-  let spins = 15;
-  const interval = setInterval(() => {
-    rows.forEach(row => {
-      const random = names[Math.floor(Math.random() * names.length)];
-      const span = row.querySelector(".player-name") || row;
-      span.textContent = random;
-    });
-
-    spins--;
-    if (spins <= 0) {
-      clearInterval(interval);
-      finishRandomize();
-    }
-  }, 80);
-
-  async function finishRandomize() {
-    const res = await fetch("/api/players/randomize", {
-      method: "POST"
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("❌ Randomize failed:", text);
-      return;
-    }
-
-    // Reload authoritative state
-    await load();
-  }
+      setTimeout(() => {
+        player.classList.remove("final-reel-flash");
+      }, 600);
+    }, index * 150); // 👈 delay per player landing
+  });
 }
 
-// function teleportChip(fromEl, toContainer) {
-//   console.log("Chip");
+async function finalizeRandomize() {
+  // Commit real shuffle on server
+  await fetch("/api/randomize", { method: "POST" });
 
-//   const fromRect = fromEl.getBoundingClientRect();
-//   const toRect = toContainer.getBoundingClientRect();
+  // Fetch authoritative state
+  const res = await fetch("/api/state");
+  const data = await res.json();
 
-//   const clone = fromEl.cloneNode(true);
-//   clone.classList.add("teleport-clone");
+  // Render FINAL positions
+  renderSelectedPlayers(data.players);
 
-//   clone.style.left = `${fromRect.left}px`;
-//   clone.style.top = `${fromRect.top}px`;
-//   clone.style.width = `${fromRect.width}px`;
-//   clone.style.height = `${fromRect.height}px`;
+  // 💛 Flash ALL players in final position (staggered)
+  requestAnimationFrame(() => {
+    flashFinalPlayers();
+  });
+}
 
-//   document.body.appendChild(clone);
+function finalGoldBlink() {
+  const players = document.querySelectorAll("#selected .player");
+  const blinkCount = 3;
+  const blinkDuration = 600; // must match goldFlash duration
+  const pauseBetween = 200;
 
-//   // Force layout
-//   clone.getBoundingClientRect();
+  let currentBlink = 0;
 
-//   // Move to center of target container
-//   const targetX =
-//     toRect.left + toRect.width / 2 - fromRect.width / 2;
-//   const targetY =
-//     toRect.top + toRect.height / 2 - fromRect.height / 2;
+  function blinkOnce() {
+    // Add gold flash
+    players.forEach(p => p.classList.add("final-reel-flash"));
 
-//   clone.style.transform = `translate(${targetX - fromRect.left}px, ${targetY - fromRect.top
-//     }px) scale(1.2)`;
-//   clone.style.opacity = "0";
+    // Remove after animation
+    setTimeout(() => {
+      players.forEach(p => p.classList.remove("final-reel-flash"));
+      currentBlink++;
 
-//   setTimeout(() => clone.remove(), 500);
-// }
+      // Schedule next blink if needed
+      if (currentBlink < blinkCount) {
+        setTimeout(blinkOnce, pauseBetween);
+      }
+    }, blinkDuration);
+  }
+
+  blinkOnce();
+}
+
+
+async function slotRandomize() {
+  const reels = Array.from(document.querySelectorAll("#selected .player"));
+  if (!reels.length) return;
+
+  /* -------------------------
+     1️⃣ START SPIN (visual only)
+  ------------------------- */
+
+  const names = reels.map(reel =>
+    reel.querySelector(".player-name")?.textContent || ""
+  );
+
+  const intervals = reels.map(reel => {
+    const nameEl = reel.querySelector(".player-name");
+    return setInterval(() => {
+      const r = Math.floor(Math.random() * names.length);
+      nameEl.textContent = names[r];
+    }, 80);
+  });
+
+  /* -------------------------
+     2️⃣ GET FINAL ORDER (server truth)
+  ------------------------- */
+
+  await fetch("/api/randomize", { method: "POST" });
+  const res = await fetch("/api/state");
+  const data = await res.json();
+  const finalPlayers = data.players;
+
+  /* -------------------------
+     3️⃣ LOCK REELS LEFT → RIGHT
+  ------------------------- */
+
+  reels.forEach((reel, index) => {
+    const lockDelay = 900 + index * 700;
+
+    setTimeout(() => {
+      // Stop this reel
+      clearInterval(intervals[index]);
+
+      // Snap to final player
+      const nameEl = reel.querySelector(".player-name");
+      const final = finalPlayers[index];
+      nameEl.textContent = `${final.emoji || ""} ${final.name}`;
+
+      // 💛 Individual gold flash (EVERY reel)
+      reel.classList.add("final-reel-flash");
+
+      setTimeout(() => {
+        reel.classList.remove("final-reel-flash");
+
+        // ✨ ONLY AFTER LAST REEL'S FLASH FINISHES
+        if (index === reels.length - 1) {
+          setTimeout(() => {
+            finalGoldBlink();
+          }, 200); // small beat after last flash
+        }
+
+      }, 600); // MUST match goldFlash duration
+
+    }, lockDelay);
+  });
+}

@@ -112,6 +112,17 @@ function advanceTurn() {
    API ROUTES
 ====================== */
 
+app.post("/api/randomize", (req, res) => {
+  // Fisher–Yates shuffle
+  for (let i = selectedPlayers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [selectedPlayers[i], selectedPlayers[j]] =
+      [selectedPlayers[j], selectedPlayers[i]];
+  }
+
+  res.json({ success: true });
+});
+
 app.post("/api/players/remove", (req, res) => {
   const { id } = req.body;
 

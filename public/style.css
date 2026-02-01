@@ -51,14 +51,12 @@ section h2 {
   gap: 12px;
   padding: 14px;
 
-  background: linear-gradient(
-    135deg,
-    rgba(0,255,255,0.08),
-    rgba(0,120,255,0.05)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 255, 255, 0.08),
+      rgba(0, 120, 255, 0.05));
 
   border-radius: 14px;
-  border: 1px solid rgba(0,255,255,0.35);
+  border: 1px solid rgba(0, 255, 255, 0.35);
 }
 
 /* =========================
@@ -68,14 +66,14 @@ section h2 {
 .player {
   padding: 8px 12px;
   border-radius: 10px;
-  background: rgba(0,80,160,0.25);
-  border: 1px solid rgba(0,255,255,0.45);
-  box-shadow: 0 0 10px rgba(0,255,255,0.45);
+  background: rgba(0, 80, 160, 0.25);
+  border: 1px solid rgba(0, 255, 255, 0.45);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.45);
   cursor: pointer;
 }
 
 .player.selected {
-  background: rgba(0,255,140,0.35);
+  background: rgba(0, 255, 140, 0.35);
 }
 
 /* =========================
@@ -102,14 +100,12 @@ section h2 {
   border: none;
   cursor: pointer;
 
-  background: linear-gradient(
-    135deg,
-    rgba(0,180,255,0.35),
-    rgba(0,80,160,0.25)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 180, 255, 0.35),
+      rgba(0, 80, 160, 0.25));
 
   color: #00ccff;
-  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+  box-shadow: 0 0 30px rgba(0, 180, 255, 0.9);
 }
 
 /* =========================
@@ -136,26 +132,24 @@ section h2 {
   border: none;
   outline: none;
 
-  background: linear-gradient(
-    135deg,
-    rgba(0,180,255,0.35),
-    rgba(0,80,160,0.25)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 180, 255, 0.35),
+      rgba(0, 80, 160, 0.25));
 
   color: #00ccff;
-  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+  box-shadow: 0 0 30px rgba(0, 180, 255, 0.9);
   caret-color: hotpink;
 }
 
 .admin-password::placeholder {
-  color: rgba(0,204,255,0.6);
+  color: rgba(0, 204, 255, 0.6);
   letter-spacing: 0.2em;
 }
 
 .admin-password:focus {
   box-shadow:
     0 0 20px hotpink,
-    0 0 40px rgba(255,105,180,0.8);
+    0 0 40px rgba(255, 105, 180, 0.8);
   transform: scale(1.05);
 }
 
@@ -179,7 +173,7 @@ body.game h1 {
   font-size: 2.6rem;
   letter-spacing: 0.2em;
   color: #00ffff;
-  text-shadow: 0 0 18px rgba(0,255,255,0.9);
+  text-shadow: 0 0 18px rgba(0, 255, 255, 0.9);
 }
 
 /* Players list container */
@@ -189,14 +183,12 @@ body.game #players {
 
 /* Player cards (restore glow + polish) */
 body.game #players .player {
-  background: linear-gradient(
-    135deg,
-    rgba(0,255,255,0.18),
-    rgba(0,80,180,0.15)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 255, 255, 0.18),
+      rgba(0, 80, 180, 0.15));
 
-  border: 1px solid rgba(0,255,255,0.45);
-  box-shadow: 0 0 18px rgba(0,255,255,0.6);
+  border: 1px solid rgba(0, 255, 255, 0.45);
+  box-shadow: 0 0 18px rgba(0, 255, 255, 0.6);
 
   transition:
     transform 0.15s ease,
@@ -207,7 +199,7 @@ body.game #players .player {
 /* Slight hover lift (non-active players) */
 body.game #players .player:not(.current-player):hover {
   transform: scale(1.02);
-  box-shadow: 0 0 24px rgba(0,255,255,0.9);
+  box-shadow: 0 0 24px rgba(0, 255, 255, 0.9);
 }
 
 /* Actions row */
@@ -227,14 +219,12 @@ body.game .actions button {
   border: none;
   cursor: pointer;
 
-  background: linear-gradient(
-    135deg,
-    rgba(0,180,255,0.35),
-    rgba(0,80,160,0.25)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 180, 255, 0.35),
+      rgba(0, 80, 160, 0.25));
 
   color: #00ccff;
-  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+  box-shadow: 0 0 30px rgba(0, 180, 255, 0.9);
 }
 
 /* =========================
@@ -285,21 +275,21 @@ body.game #players .player.current-player {
   0% {
     box-shadow:
       0 0 0 3px hotpink,
-      0 0 18px rgba(255,105,180,0.7);
+      0 0 18px rgba(255, 105, 180, 0.7);
     filter: brightness(1);
   }
 
   50% {
     box-shadow:
       0 0 0 6px hotpink,
-      0 0 42px rgba(255,105,180,1);
+      0 0 42px rgba(255, 105, 180, 1);
     filter: brightness(1.2);
   }
 
   100% {
     box-shadow:
       0 0 0 3px hotpink,
-      0 0 18px rgba(255,105,180,0.7);
+      0 0 18px rgba(255, 105, 180, 0.7);
     filter: brightness(1);
   }
 }
@@ -310,7 +300,8 @@ body.game #players .player.current-player {
 
 body.game {
   position: relative;
-  background: #000; /* fallback */
+  background: #000;
+  /* fallback */
   overflow: hidden;
 }
 
@@ -325,17 +316,19 @@ body.game::before {
   background-position: center;
   background-repeat: no-repeat;
 
-  opacity: 0.3;              /* 👈 scary, not distracting */
+  opacity: 0.3;
+  /* 👈 scary, not distracting */
   filter: contrast(1.15) saturate(0.8) brightness(0.7);
 
   z-index: 0;
   pointer-events: none;
 }
+
 /* =========================
    GAME — FINAL PLAYER SIZE OVERRIDE
 ========================= */
 
-body.game #players > .player {
+body.game #players>.player {
   min-height: 56px;
   padding: 14px 28px;
   font-size: 1.2rem;
@@ -358,13 +351,13 @@ body.game #players {
   0% {
     transform: scale(1);
     filter: brightness(1) saturate(1);
-    box-shadow: 0 0 20px rgba(255,255,255,0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
   }
 
   15% {
     transform: scale(1.06);
     filter: brightness(2.2) saturate(2);
-    box-shadow: 0 0 60px rgba(255,0,0,1);
+    box-shadow: 0 0 60px rgba(255, 0, 0, 1);
   }
 
   30% {
@@ -387,7 +380,7 @@ body.game #players {
     transform: scale(0.96);
     filter: grayscale(100%) brightness(0.45);
     opacity: 0.55;
-    box-shadow: 0 0 8px rgba(255,0,0,0.25);
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.25);
   }
 }
 
@@ -412,7 +405,8 @@ body.game #players .player.eliminated {
   filter: grayscale(100%) brightness(0.45);
   opacity: 0.55;
   box-shadow: none;
-  animation: none !important; /* extra safety */
+  animation: none !important;
+  /* extra safety */
 }
 
 /* Cracked glass ONLY during animation */
@@ -422,12 +416,12 @@ body.game #players .player.eliminating::after {
   inset: -8%;
 
   background-image:
-    radial-gradient(circle at 25% 30%, rgba(255,255,255,0.85) 2%, transparent 3%),
-    radial-gradient(circle at 70% 40%, rgba(255,255,255,0.7) 2%, transparent 3%),
-    linear-gradient(25deg, transparent 45%, rgba(255,255,255,0.35) 50%, transparent 55%),
-    linear-gradient(-35deg, transparent 46%, rgba(255,255,255,0.3) 50%, transparent 54%),
-    linear-gradient(65deg, transparent 44%, rgba(255,255,255,0.25) 48%, transparent 52%),
-    linear-gradient(-75deg, transparent 43%, rgba(255,255,255,0.2) 47%, transparent 51%);
+    radial-gradient(circle at 25% 30%, rgba(255, 255, 255, 0.85) 2%, transparent 3%),
+    radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.7) 2%, transparent 3%),
+    linear-gradient(25deg, transparent 45%, rgba(255, 255, 255, 0.35) 50%, transparent 55%),
+    linear-gradient(-35deg, transparent 46%, rgba(255, 255, 255, 0.3) 50%, transparent 54%),
+    linear-gradient(65deg, transparent 44%, rgba(255, 255, 255, 0.25) 48%, transparent 52%),
+    linear-gradient(-75deg, transparent 43%, rgba(255, 255, 255, 0.2) 47%, transparent 51%);
 
   background-repeat: no-repeat;
   background-size: cover;
@@ -446,5 +440,264 @@ body.game #players .player.eliminating::after {
 body.game #players {
   display: flex;
   flex-direction: column;
-  gap: 44px;          /* 👈 THIS is the spacing */
+  gap: 44px;
+  /* 👈 THIS is the spacing */
+}
+
+/* =========================
+   SLOT MACHINE — FINAL REEL GOLD FLASH
+========================= */
+
+.player.final-reel-flash {
+  animation: goldFlash 600ms ease-out forwards;
+}
+
+@keyframes goldFlash {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(255, 215, 0, 0),
+      0 0 20px rgba(255, 215, 0, 0.6);
+    transform: scale(1);
+  }
+
+  40% {
+    box-shadow:
+      0 0 0 4px gold,
+      0 0 50px rgba(255, 215, 0, 1);
+    transform: scale(1.05);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(255, 215, 0, 0),
+      0 0 20px rgba(255, 215, 0, 0.6);
+    transform: scale(1);
+  }
+}
+
+
+
+/* =========================
+   WINNER CELEBRATION — GOLD BAR
+========================= */
+body.game #winner-banner {
+  position: fixed;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+body.game .winner-name {
+  display: inline-block;
+  padding: 26px 72px;
+
+  font-family:
+    "Playfair Display",
+    "Cinzel",
+    "Trajan Pro",
+    serif;
+
+  font-size: 3.4rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+
+  color: #3a2400;
+
+  background: linear-gradient(
+    135deg,
+    #fff8c9,
+    #ffd700 28%,
+    #ffb700 52%,
+    #ffd700 76%,
+    #fffbe0
+  );
+
+  border-radius: 20px;
+  border: 3px solid rgba(255,215,0,0.95);
+
+  box-shadow:
+    0 0 30px rgba(255,215,0,0.85),
+    inset 0 2px 8px rgba(255,255,255,0.9),
+    inset 0 -3px 6px rgba(140,90,0,0.6);
+
+  position: relative;
+  overflow: hidden;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.8),
+    0 -1px 0 rgba(140,90,0,0.7);
+
+  animation:
+    winnerBreath 3s ease-in-out infinite,
+    winnerTilt 5s ease-in-out infinite;
+}
+
+@keyframes winnerBreath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+
+body.game .winner-name::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(120deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 65%);
+  transform: translateX(-100%);
+  animation: goldSweep 3s infinite;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes winnerPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes winnerTilt {
+  0% {
+    transform: scale(1) rotateX(0deg) rotateY(0deg);
+  }
+
+  25% {
+    transform: scale(1.05) rotateY(6deg);
+  }
+
+  50% {
+    transform: scale(1.08) rotateX(6deg);
+  }
+
+  75% {
+    transform: scale(1.05) rotateY(-6deg);
+  }
+
+  100% {
+    transform: scale(1) rotateX(0deg) rotateY(0deg);
+  }
+}
+
+@keyframes goldSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(120%);
+  }
+
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* =========================
+   WINNER CELEBRATION — SPOTLIGHT CONE
+========================= */
+
+body.game #winner-banner::before {
+  content: "";
+  position: absolute;
+
+  top: -420px;
+  /* start above banner */
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 520px;
+  height: 800px;
+
+  background: radial-gradient(ellipse at top,
+      rgba(255, 235, 170, 0.65) 0%,
+      rgba(255, 215, 0, 0.35) 35%,
+      rgba(255, 215, 0, 0.15) 55%,
+      rgba(255, 215, 0, 0.05) 70%,
+      transparent 85%);
+
+  clip-path: polygon(50% 0%,
+      0% 100%,
+      100% 100%);
+
+  filter: blur(8px);
+  opacity: 0.85;
+
+  z-index: -1;
+  pointer-events: none;
+
+  animation: spotlightPulse 4.5s ease-in-out infinite;
+}
+
+/* =========================
+   SPOTLIGHT ANIMATION
+========================= */
+
+@keyframes spotlightPulse {
+
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: translateX(-50%) scaleY(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1.05);
+  }
+}
+
+/* =========================
+   FINAL ELIMINATION — RED SCREEN PULSE
+========================= */
+
+body.game::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 0, 0, 0.45),
+    rgba(120, 0, 0, 0.65)
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Trigger */
+body.game.final-death-pulse::after {
+  animation: redDeathPulse 1.2s ease-out forwards;
+}
+
+@keyframes redDeathPulse {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  55% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
 }
