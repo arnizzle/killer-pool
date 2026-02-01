@@ -158,3 +158,293 @@ section h2 {
     0 0 40px rgba(255,105,180,0.8);
   transform: scale(1.05);
 }
+
+/* =========================
+   GAME PAGE — VISUAL STYLING
+========================= */
+
+body.game .app {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Game title */
+body.game h1 {
+  font-size: 2.6rem;
+  letter-spacing: 0.2em;
+  color: #00ffff;
+  text-shadow: 0 0 18px rgba(0,255,255,0.9);
+}
+
+/* Players list container */
+body.game #players {
+  width: 100%;
+}
+
+/* Player cards (restore glow + polish) */
+body.game #players .player {
+  background: linear-gradient(
+    135deg,
+    rgba(0,255,255,0.18),
+    rgba(0,80,180,0.15)
+  );
+
+  border: 1px solid rgba(0,255,255,0.45);
+  box-shadow: 0 0 18px rgba(0,255,255,0.6);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.2s ease;
+}
+
+/* Slight hover lift (non-active players) */
+body.game #players .player:not(.current-player):hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 24px rgba(0,255,255,0.9);
+}
+
+/* Actions row */
+body.game .actions {
+  margin-top: 20px;
+}
+
+/* Action buttons (match index look) */
+body.game .actions button {
+  width: 220px;
+  height: 80px;
+
+  font-size: 1.4rem;
+  letter-spacing: 0.25em;
+
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+
+  background: linear-gradient(
+    135deg,
+    rgba(0,180,255,0.35),
+    rgba(0,80,160,0.25)
+  );
+
+  color: #00ccff;
+  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+}
+
+/* =========================
+   PLAYER HEART ALIGNMENT
+========================= */
+
+/* Player row layout */
+.player {
+  display: flex;
+  align-items: center;
+}
+
+/* Name stays on the left */
+.player .player-name {
+  flex: 1;
+}
+
+/* Hearts snap to the right */
+.player .hearts {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* =========================
+   GAME — BIGGER PLAYER BOXES
+========================= */
+
+body.game #players .player {
+  min-height: 110px;
+  padding: 28px 48px;
+
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+
+  border-radius: 22px;
+}
+
+/* =========================
+   CURRENT PLAYER — PULSE
+========================= */
+
+body.game #players .player.current-player {
+  animation: currentPlayerPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes currentPlayerPulse {
+  0% {
+    box-shadow:
+      0 0 0 3px hotpink,
+      0 0 18px rgba(255,105,180,0.7);
+    filter: brightness(1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 6px hotpink,
+      0 0 42px rgba(255,105,180,1);
+    filter: brightness(1.2);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 3px hotpink,
+      0 0 18px rgba(255,105,180,0.7);
+    filter: brightness(1);
+  }
+}
+
+/* =========================
+   GAME — SCARY BACKGROUND
+========================= */
+
+body.game {
+  position: relative;
+  background: #000; /* fallback */
+  overflow: hidden;
+}
+
+/* Pool-table background layer */
+body.game::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background-image: url("/assets/pool-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0.3;              /* 👈 scary, not distracting */
+  filter: contrast(1.15) saturate(0.8) brightness(0.7);
+
+  z-index: 0;
+  pointer-events: none;
+}
+/* =========================
+   GAME — FINAL PLAYER SIZE OVERRIDE
+========================= */
+
+body.game #players > .player {
+  min-height: 56px;
+  padding: 14px 28px;
+  font-size: 1.2rem;
+  border-radius: 16px;
+}
+
+/* Increase vertical spacing between players */
+body.game #players {
+  row-gap: 144px;
+}
+
+
+/* =========================
+   GAME — DRAMATIC ELIMINATION
+========================= */
+
+
+/* Main elimination animation */
+@keyframes eliminationSequence {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+    box-shadow: 0 0 20px rgba(255,255,255,0.6);
+  }
+
+  15% {
+    transform: scale(1.06);
+    filter: brightness(2.2) saturate(2);
+    box-shadow: 0 0 60px rgba(255,0,0,1);
+  }
+
+  30% {
+    transform: translateX(-10px);
+  }
+
+  45% {
+    transform: translateX(10px);
+  }
+
+  60% {
+    transform: translateX(-6px);
+  }
+
+  75% {
+    transform: translateX(6px);
+  }
+
+  100% {
+    transform: scale(0.96);
+    filter: grayscale(100%) brightness(0.45);
+    opacity: 0.55;
+    box-shadow: 0 0 8px rgba(255,0,0,0.25);
+  }
+}
+
+/* =========================
+   GAME — ELIMINATION (ONCE)
+========================= */
+
+/* ONE-TIME animation */
+body.game #players .player.eliminating {
+  animation: eliminationSequence 1.3s ease-out forwards;
+  pointer-events: none;
+  position: relative;
+}
+
+body.game #players .player.eliminating {
+  animation: eliminationSequence 1.3s ease-out forwards;
+  pointer-events: none;
+  position: relative;
+}
+
+body.game #players .player.eliminated {
+  filter: grayscale(100%) brightness(0.45);
+  opacity: 0.55;
+  box-shadow: none;
+  animation: none !important; /* extra safety */
+}
+
+/* Cracked glass ONLY during animation */
+body.game #players .player.eliminating::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+
+  background-image:
+    radial-gradient(circle at 25% 30%, rgba(255,255,255,0.85) 2%, transparent 3%),
+    radial-gradient(circle at 70% 40%, rgba(255,255,255,0.7) 2%, transparent 3%),
+    linear-gradient(25deg, transparent 45%, rgba(255,255,255,0.35) 50%, transparent 55%),
+    linear-gradient(-35deg, transparent 46%, rgba(255,255,255,0.3) 50%, transparent 54%),
+    linear-gradient(65deg, transparent 44%, rgba(255,255,255,0.25) 48%, transparent 52%),
+    linear-gradient(-75deg, transparent 43%, rgba(255,255,255,0.2) 47%, transparent 51%);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.25);
+  animation: crackFlash 480ms ease-out forwards;
+  z-index: 3;
+}
+
+/* =========================
+   GAME — PLAYER LAYOUT (FIX)
+========================= */
+
+body.game #players {
+  display: flex;
+  flex-direction: column;
+  gap: 44px;          /* 👈 THIS is the spacing */
+}

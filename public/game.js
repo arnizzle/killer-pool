@@ -26,7 +26,7 @@ function startEmojiRain(emoji = "🎉", duration = 5000) {
 
     el.style.left = Math.random() * 100 + "vw";
     el.style.fontSize = 1.5 + Math.random() * 2.5 + "rem";
-    el.style.animationDuration = 2.5 + Math.random() * 2 + "s";
+    // el.style.animationDuration = 2.5 + Math.random() * 2 + "s";
 
     document.body.appendChild(el);
 
@@ -123,83 +123,74 @@ async function sendAction(type) {
 
 function renderPlayers(players) {
   const container = document.getElementById("players");
-  if (!container) {
-    console.warn("❌ renderPlayers: #players not found");
+  if (!container) return;
+
+  if (!Array.isArray(players)) {
+    container.innerHTML = "";
     return;
   }
 
   container.innerHTML = "";
 
-  if (!Array.isArray(players)) return;
-
-  players.forEach(p => {
+  players.forEach(player => {
     const div = document.createElement("div");
-    div.className = "player";
-    div.dataset.id = p.id;
-    div.dataset.misses = p.misses;
+    div.classList.add("player");
 
+    div.dataset.id = player.id;
+    div.dataset.misses = player.misses ?? 0;
 
-    if (p.active) div.classList.add("active");
-    
-    if (String(p.id) === String(currentPlayerId)) {
+    /* -------------------------
+       CURRENT PLAYER
+    ------------------------- */
+    if (String(player.id) === String(currentPlayerId)) {
       div.classList.add("current-player");
     }
-    console.log("CURRENT PLAYER ID:", currentPlayerId);
 
-
-    if (p.eliminated) div.classList.add("eliminated");
-
-    // FORCE first non-eliminated player active (debug)
-    if (!players.some(pl => pl.active) && !p.eliminated) {
-      div.classList.add("active");
-    }
-
-    // Name + emoji
+    /* -------------------------
+       NAME
+    ------------------------- */
     const name = document.createElement("span");
     name.className = "player-name";
-    name.textContent = `${p.emoji || ""} ${p.name}`;
+    name.textContent = `${player.emoji || ""} ${player.name}`;
 
-    // Hearts (3 lives)
+    /* -------------------------
+       HEARTS
+    ------------------------- */
     const hearts = document.createElement("span");
     hearts.className = "hearts";
-    const remaining = Math.max(0, 3 - (p.misses || 0));
-    hearts.textContent = "❤️".repeat(remaining);
+    hearts.textContent = "❤️".repeat(Math.max(0, 3 - (player.misses || 0)));
 
     div.appendChild(name);
     div.appendChild(hearts);
 
-    // ELIMINATED overlay (play ONCE)
-    if (p.eliminated) {
-      // If we've already animated this player, render static eliminated state
-      if (eliminatedAnimated.has(p.id)) {
-        div.classList.add("eliminated");
+    /* -------------------------
+       ELIMINATION (TRANSITION-AWARE)
+    ------------------------- */
+    if (player.eliminated === true) {
+      const label = document.createElement("div");
+      label.className = "eliminated-label";
+      label.textContent = "ELIMINATED";
+      div.appendChild(label);
 
-        const label = document.createElement("div");
-        label.className = "eliminated-label";
-        label.textContent = "ELIMINATED";
-        div.appendChild(label);
+      // 🔥 Animate ONLY on first transition
+      if (!eliminatedAnimated.has(player.id)) {
+        eliminatedAnimated.add(player.id);
+        div.classList.add("eliminating");
+
+        // After animation → permanent state
+        setTimeout(() => {
+          div.classList.remove("eliminating");
+          div.classList.add("eliminated");
+        }, 1300);
       } else {
-        // First-time elimination animation
-        eliminatedAnimated.add(p.id);
-
-        div.classList.add("crack");
-
-        const label = document.createElement("div");
-        label.className = "eliminated-label";
-        label.textContent = "ELIMINATED";
-        div.appendChild(label);
-
-        requestAnimationFrame(() => {
-          label.classList.add("animate");
-        });
+        // 🧊 Static forever
+        div.classList.add("eliminated");
       }
     }
-
 
     container.appendChild(div);
   });
 }
-
 
 /* =========================================================
    ACTIONS (HIT / MISS)

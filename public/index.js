@@ -229,7 +229,6 @@ async function removePlayer(playerId) {
   // Refresh selected players
   load();
 }
-
 function renderSelectedPlayers(players) {
   const container = document.getElementById("selected");
   if (!container) {
@@ -239,12 +238,13 @@ function renderSelectedPlayers(players) {
 
   container.innerHTML = "";
 
-  if (!players.length) {
+  if (!Array.isArray(players) || players.length === 0) {
     container.innerHTML = "<em>No players selected</em>";
     teleportQueue.length = 0;
     return;
   }
 
+  // Snapshot teleport order once
   const teleportSnapshot = [...teleportQueue];
 
   players.forEach(p => {
@@ -252,102 +252,28 @@ function renderSelectedPlayers(players) {
     div.className = "player selected";
     div.dataset.id = p.id;
 
+    // Teleport animation (if queued)
     const idx = teleportSnapshot.indexOf(p.id);
     if (idx !== -1) {
       div.style.animationDelay = `${idx * 90}ms`;
       div.classList.add("teleport-in");
     }
 
-    const name = document.createElement("span");
-    name.className = "player-name";
-    name.textContent = `${p.emoji || ""} ${p.name}`;
-
-    const remove = document.createElement("button");
-    remove.className = "remove";
-    remove.textContent = "✕";
-    remove.onclick = () => removePlayer(p.id);
-
-    div.appendChild(name);
-    div.appendChild(remove);
-    container.appendChild(div);
-  });
-
-  teleportQueue.length = 0; // ✅ clear AFTER render
-
-  container.innerHTML = "";
-
-  if (!Array.isArray(players) || players.length === 0) {
-    container.innerHTML = "<em>No players selected</em>";
-    return;
-  }
-
-  players.forEach((p, index) => {
-    const div = document.createElement("div");
-    div.className = "player selected";
-    div.dataset.id = p.id;
-
-    // BURST TELEPORT
-    const idx = teleportSnapshot.indexOf(p.id);
-    if (idx !== -1) {
-      div.style.animationDelay = `${idx * 90}ms`;
-      div.classList.add("teleport-in");
-    }
-
-    // Clear queue AFTER rendering
-    teleportQueue = [];
-    teleportQueue.length = 0;
-
+    // Click the CHIP ITSELF to unselect
+    div.onclick = () => removePlayer(p.id);
 
     // Name + emoji
     const name = document.createElement("span");
     name.className = "player-name";
     name.textContent = `${p.emoji || ""} ${p.name}`;
 
-    // Remove button (only if game not started)
-    const remove = document.createElement("button");
-    remove.className = "remove";
-    remove.textContent = "✕";
-    remove.onclick = () => removePlayer(p.id);
-
     div.appendChild(name);
-    div.appendChild(remove);
     container.appendChild(div);
   });
+
+  // ✅ Clear teleport queue AFTER render
+  teleportQueue.length = 0;
 }
-
-
-// function renderSelectedPlayers(players) {
-//   const container = document.getElementById("selected");
-//   if (!container) {
-//     console.warn("❌ renderSelectedPlayers: #selected not found");
-//     return;
-//   }
-
-//   container.innerHTML = "";
-
-//   if (!players.length) {
-//     container.innerHTML = "<em>No players selected</em>";
-//     return;
-//   }
-
-//   players.forEach(p => {
-//     const div = document.createElement("div");
-//     div.className = "player selected";
-
-//     const name = document.createElement("span");
-//     name.className = "player-name";
-//     name.textContent = `${p.emoji || ""} ${p.name}`;
-
-//     const remove = document.createElement("button");
-//     remove.className = "remove";
-//     remove.textContent = "✕";
-//     remove.onclick = () => removePlayer(p.id);
-
-//     div.appendChild(name);
-//     div.appendChild(remove);
-//     container.appendChild(div);
-//   });
-// }
 
 async function startGame() {
   const res = await fetch("/api/game/start", {
