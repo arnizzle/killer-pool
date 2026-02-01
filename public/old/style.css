@@ -15,28 +15,24 @@ body {
 }
 
 /* =========================
-   APP GRID (LANDSCAPE)
+   APP GRID (INDEX)
 ========================= */
 
 .app {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: auto;
   gap: 32px;
   height: calc(100vh - 40px);
 }
 
-/* Title spans both columns */
 .app > h1 {
   grid-column: 1 / -1;
   text-align: center;
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 2.4rem;
   letter-spacing: 0.15em;
   color: #00ffff;
-  text-shadow:
-    0 0 12px rgba(0, 255, 255, 0.9),
-    0 0 28px rgba(0, 255, 255, 0.6);
+  text-shadow: 0 0 18px rgba(0,255,255,0.9);
 }
 
 /* =========================
@@ -46,120 +42,65 @@ body {
 section {
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 section h2 {
-  margin: 0 0 12px 0;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 1.2rem;
-  letter-spacing: 0.12em;
+  text-align: center;
+  margin-bottom: 12px;
   color: #7ffcff;
-  text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
 }
 
 /* =========================
-   GAME PLAYER LIST
-========================= */
-
-#players {
-  display: flex;
-  flex-direction: column;
-  gap: 18px; /* more breathing room */
-}
-
-.player {
-  font-size: 1.3em;          /* ⬅️ ~30% larger */
-  padding: 18px 24px;        /* chunkier chip */
-  border-radius: 14px;
-
-  background: rgba(0, 255, 0, 0.08);
-  border: 1px solid rgba(0, 255, 0, 0.4);
-
-  box-shadow:
-    0 0 16px rgba(0, 255, 0, 0.4),
-    inset 0 0 12px rgba(0, 255, 0, 0.25);
-}
-
-/* Active player pop */
-.player.active {
-  background: rgba(0, 255, 0, 0.18);
-  box-shadow:
-    0 0 28px rgba(0, 255, 0, 0.9),
-    inset 0 0 14px rgba(0, 255, 0, 0.5);
-}
-
-/* =========================
-   PLAYER CONTAINERS
+   PLAYER CONTAINERS (INDEX)
 ========================= */
 
 #known,
 #selected {
-  flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
   padding: 14px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(0,255,255,0.08),
+    rgba(0,120,255,0.05)
+  );
+
   border-radius: 14px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(0, 255, 255, 0.08),
-      rgba(0, 120, 255, 0.05)
-    );
-
-  border: 1px solid rgba(0, 255, 255, 0.35);
-
-  box-shadow:
-    inset 0 0 18px rgba(0, 255, 255, 0.15),
-    0 0 20px rgba(0, 255, 255, 0.2);
-
+  border: 1px solid rgba(0,255,255,0.35);
   overflow-y: auto;
-  align-content: start;
 }
 
 /* =========================
-   PLAYER CHIP
+   PLAYER CHIP (BASE)
 ========================= */
 
 .player {
+  position: relative;
   height: 48px;
   padding: 6px 10px;
-  border-radius: 10px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
+  border-radius: 10px;
   font-size: 0.9rem;
   white-space: nowrap;
 
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 255, 0.18),
-    rgba(0, 80, 180, 0.15)
+    rgba(0,255,255,0.18),
+    rgba(0,80,180,0.15)
   );
 
-  border: 1px solid rgba(0, 255, 255, 0.45);
+  border: 1px solid rgba(0,255,255,0.45);
+  box-shadow: 0 0 10px rgba(0,255,255,0.45);
 
-  box-shadow:
-    0 0 10px rgba(0, 255, 255, 0.45),
-    inset 0 0 10px rgba(0, 255, 255, 0.2);
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 2;
 }
-
-/* =========================
-   KNOWN PLAYERS (LEFT)
-========================= */
 
 .player.known {
   cursor: pointer;
@@ -167,637 +108,256 @@ section h2 {
 
 .player.known:hover {
   transform: scale(1.06);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 255, 255, 0.35),
-    rgba(0, 160, 255, 0.25)
-  );
-
-  box-shadow:
-    0 0 18px rgba(0, 255, 255, 0.85),
-    inset 0 0 12px rgba(0, 255, 255, 0.3);
 }
-
-/* =========================
-   SELECTED PLAYERS (RIGHT)
-========================= */
 
 .player.selected {
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 140, 0.35),
-    rgba(0, 120, 80, 0.25)
+    rgba(0,255,140,0.35),
+    rgba(0,120,80,0.25)
   );
-
-  border-color: rgba(0, 255, 140, 0.7);
-
-  box-shadow:
-    0 0 14px rgba(0, 255, 140, 0.9),
-    inset 0 0 10px rgba(0, 255, 140, 0.35);
+  border-color: rgba(0,255,140,0.7);
 }
-
-/* =========================
-   PLAYER NAME
-========================= */
-
-.player-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =========================
-   REMOVE BUTTON
-========================= */
 
 .player .remove {
   background: none;
   border: none;
   color: #ff5c5c;
-  font-size: 1.1rem;
   cursor: pointer;
-  padding: 0 4px;
 }
 
-.player .remove:hover {
-  color: #ff0000;
-  text-shadow: 0 0 8px #ff0000;
+/* =========================
+   GAME PAGE
+========================= */
+
+body.game {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+body.game::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/assets/pool-bg.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  z-index: 0;
+}
+
+body.game .app {
+  position: relative;
+  z-index: 3;
+}
+
+/* =========================
+   GAME PLAYERS
+========================= */
+
+#players {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#players .player {
+  min-height: 84px;
+  padding: 22px 36px;
+  font-size: 1.35em;
+  border-radius: 18px;
+}
+
+/* CURRENT PLAYER (PINK BOX) */
+#players .player.current-player {
+  border: 4px solid hotpink;
+  box-shadow:
+    0 0 12px hotpink,
+    0 0 28px rgba(255,105,180,0.9);
+}
+
+/* DANGER (2 MISSES) */
+#players .player[data-misses="2"] {
+  animation: dangerPulse 0.8s infinite;
+}
+
+@keyframes dangerPulse {
+  0%   { box-shadow: 0 0 10px red; }
+  50%  { box-shadow: 0 0 30px red; }
+  100% { box-shadow: 0 0 10px red; }
+}
+
+/* ELIMINATED */
+.player.eliminated {
+  filter: grayscale(100%) brightness(0.6);
+  opacity: 0.85;
 }
 
 /* =========================
    ACTION BUTTONS
 ========================= */
-/* =========================
-   GAME ACTION BUTTONS
-========================= */
 
 .actions {
   margin-top: 30px;
   display: flex;
-  justify-content: center;
   gap: 40px;
+  justify-content: center;
+  z-index: 2;
 }
 
 .actions button {
   width: 220px;
   height: 80px;
 
-  font-family: "Orbitron", sans-serif;
   font-size: 1.4rem;
   letter-spacing: 0.25em;
 
   border-radius: 14px;
-  cursor: pointer;
   border: none;
+  cursor: pointer;
 
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
-}
-
-/* HIT BUTTON */
-#hitBtn {
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 140, 0.35),
-    rgba(0, 160, 80, 0.25)
+    rgba(0,180,255,0.35),
+    rgba(0,80,160,0.25)
   );
-
-  color: #00ff9c;
-
-  box-shadow:
-    0 0 30px rgba(0, 255, 140, 0.9),
-    inset 0 0 16px rgba(0, 255, 140, 0.4);
-}
-
-#hitBtn:hover {
-  transform: scale(1.1);
-  box-shadow:
-    0 0 45px rgba(0, 255, 140, 1),
-    inset 0 0 20px rgba(0, 255, 140, 0.6);
-}
-
-/* MISS BUTTON */
-#missBtn {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 60, 60, 0.35),
-    rgba(180, 20, 20, 0.25)
-  );
-
-  color: #ff4c4c;
-
-  box-shadow:
-    0 0 30px rgba(255, 60, 60, 0.9),
-    inset 0 0 16px rgba(255, 60, 60, 0.4);
-}
-
-#missBtn:hover {
-  transform: scale(1.1);
-  box-shadow:
-    0 0 45px rgba(255, 60, 60, 1),
-    inset 0 0 20px rgba(255, 60, 60, 0.6);
-}
-
-.actions button:hover {
-  transform: scale(1.08);
-  box-shadow:
-    0 0 22px rgba(0, 255, 255, 1),
-    inset 0 0 14px rgba(0, 255, 255, 0.4);
-}
-
-/* =========================
-   GAME LOCK
-========================= */
-
-body.game-started .player.known {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-/* =========================
-   MOBILE FALLBACK
-========================= */
-
-@media (max-width: 900px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================
-   TELEPORT EFFECT
-========================= */
-
-.teleport-clone {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-
-  transition:
-    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.45s ease;
-
-  box-shadow:
-    0 0 30px rgba(0, 255, 255, 1),
-    inset 0 0 20px rgba(0, 255, 255, 0.6);
-}
-/* =========================
-   INDEX ACTION BUTTONS
-========================= */
-
-.actions button {
-  width: 220px;
-  height: 80px;
-
-  font-family: "Orbitron", sans-serif;
-  font-size: 1.4rem;
-  letter-spacing: 0.25em;
-
-  border-radius: 14px;
-  cursor: pointer;
-  border: none;
 
   color: #00ccff;
+  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+}
+
+/* =========================
+   ADMIN PASSWORD (FACELIFT)
+========================= */
+/* =========================
+   ADMIN PASSWORD — WORKING
+========================= */
+
+.admin-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.admin-password {
+  box-sizing: border-box;
+
+  width: 220px;
+  height: 80px;
+
+  padding: 0 16px;
+
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+
+  border-radius: 14px;
+  border: none;
+  outline: none;
 
   background: linear-gradient(
     135deg,
-    rgba(0, 180, 255, 0.35),
-    rgba(0, 80, 160, 0.25)
+    rgba(0,180,255,0.35),
+    rgba(0,80,160,0.25)
   );
 
-  box-shadow:
-    0 0 30px rgba(0, 180, 255, 0.9),
-    inset 0 0 16px rgba(0, 180, 255, 0.4);
+  color: #00ccff;
+  box-shadow: 0 0 30px rgba(0,180,255,0.9);
 
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
+  caret-color: hotpink;
 }
 
-.actions button:hover {
-  transform: scale(1.1);
-  box-shadow:
-    0 0 45px rgba(0, 200, 255, 1),
-    inset 0 0 20px rgba(0, 200, 255, 0.6);
-}
-/* =========================
-   GAME PAGE CENTERING
-========================= */
-
-/* =========================
-   GAME PAGE LAYOUT
-========================= */
-
-body.game {
-  min-height: 100vh;
-  margin: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background: radial-gradient(circle at center, #060c12 0%, #020407 70%);
-}
-
-.game {
-  width: 100%;
-  max-width: 720px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 28px;
-}
-
-
-/* =========================
-   GAME PAGE CENTERING
-========================= */
-
-body.game {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  min-height: 100vh;
-  margin: 0;
-}
-
-.game {
-  width: 100%;
-  max-width: 520px;          /* keeps it tight & readable */
-  padding: 24px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-/* =========================
-   START GAME PULSE
-========================= */
-
-@keyframes pulseGlow {
-  0% {
-    box-shadow:
-      0 0 18px rgba(0, 200, 255, 0.6),
-      inset 0 0 10px rgba(0, 200, 255, 0.3);
-  }
-  50% {
-    box-shadow:
-      0 0 36px rgba(0, 255, 255, 1),
-      inset 0 0 18px rgba(0, 255, 255, 0.6);
-  }
-  100% {
-    box-shadow:
-      0 0 18px rgba(0, 200, 255, 0.6),
-      inset 0 0 10px rgba(0, 200, 255, 0.3);
-  }
-}
-
-.actions button.pulse {
-  animation: pulseGlow 1.4s infinite ease-in-out;
-}
-
-/* =========================
-   RANDOMIZE LOCK OVERLAY
-========================= */
-
-.locked-wrapper {
-  position: relative;
-}
-
-.lock-overlay {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-family: "Orbitron", sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.25em;
-
-  color: #ff3c3c;
-  background: rgba(20, 0, 0, 0.75);
-
-  border-radius: 14px;
-
-  /* opacity: 1; FIX? */
-  pointer-events: none;
-
-  text-shadow:
-    0 0 12px rgba(255, 60, 60, 1),
-    0 0 24px rgba(255, 60, 60, 0.8);
-
-  animation: lockPulse 1.4s infinite ease-in-out;
-}
-
-@keyframes lockPulse {
-  0%   { opacity: 0.55; }
-  50%  { opacity: 0.95; }
-  100% { opacity: 0.55; }
-}
-
-/* Locked state */
-.locked-wrapper.locked .lock-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.locked-wrapper.locked button {
-  pointer-events: none;
-}
-/* =========================
-   EMOJI RAIN
-========================= */
-
-.emoji-rain {
-  position: fixed;
-  top: -50px;
-  pointer-events: none;
-  z-index: 9999;
-
-  font-size: 2.2rem;
-  opacity: 0.9;
-
-  animation-name: emojiFall;
-  animation-timing-function: linear;
-}
-
-@keyframes emojiFall {
-  from {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(110vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-.fireworks,
-#fireworks,
-canvas.fireworks {
-  position: fixed;
-  inset: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  pointer-events: none;
-  z-index: 9999;
-}
-
-
-/* =========================
-   ELIMINATED SLAM
-========================= */
-
-/* =========================
-   ELIMINATED SLAM — DRAMATIC
-========================= */
-
-.eliminated-label {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-family: "Orbitron", sans-serif;
-  font-size: 3.2rem;              /* BIGGER */
-  letter-spacing: 0.35em;
-
-  color: #ff1e1e;
-
-  text-shadow:
-    0 0 20px rgba(255, 30, 30, 1),
-    0 0 40px rgba(255, 30, 30, 0.9),
-    0 0 80px rgba(255, 30, 30, 0.6);
-
-  pointer-events: none;
-  opacity: 0;
-
-  transform: scale(4) rotate(-18deg);
-}
-
-.player.eliminated .eliminated-label.animate {
-  animation: eliminatedSlamHard 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes eliminatedSlamHard {
-  0% {
-    opacity: 0;
-    transform: scale(4.5) rotate(-25deg);
-  }
-
-  35% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-
-  65% {
-    transform: scale(0.98);
-  }
-
-  100% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
-}
-
-/* 
-.player.eliminated {
-  position: relative;
-}
-
-.player.eliminated .eliminated-label.animate {
-  animation: eliminatedSlam 0.9s ease-out forwards;
-}
-
-@keyframes eliminatedSlam {
-  0% {
-    opacity: 0;
-    transform: scale(3.5) rotate(-20deg);
-  }
-  45% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-  60% {
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-} */
-
-/* =========================
-   GAME PLAYER SIZE BOOST
-========================= */
-
-#players {
-  width: 100%;
-  max-width: 900px;        /* wider overall column */
-}
-
-#players .player {
-  width: 100%;             /* full-width rows */
-  min-height: 84px;        /* ~30% taller */
-  padding: 22px 36px;      /* taller + much wider */
-
-  font-size: 1.35em;       /* readable from distance */
-  letter-spacing: 0.08em;
-
-  border-radius: 18px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Name gets room to breathe */
-#players .player-name {
-  flex: 1;
-  font-size: 1.1em;
-}
-
-/* Hearts stay aligned right */
-#players .hearts {
-  font-size: 1.2em;
-  margin-left: 24px;
-}
-
-/* Active player POPS */
-#players .player.active {
-  box-shadow:
-    0 0 40px rgba(0, 255, 0, 1),
-    inset 0 0 22px rgba(0, 255, 0, 0.6);
-}
-
-/* =========================
-   ELIMINATED — DEAD STATE
-========================= */
-
-.player.eliminated {
-  filter: grayscale(100%) brightness(0.65);
-  opacity: 0.85;
-}
-
-.player.eliminated .player-name,
-.player.eliminated .hearts {
-  color: #888;
-  text-shadow: none;
-}
-
-
-.centerimage {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
-/* =========================
-   ADMIN PASSWORD — CYBER
-========================= */
-
-.admin-password {
-  margin-top: 20px;
-  width: 120;
-  height: 120;
-  padding: 14px 16px;
-
-  text-align: center;
-
-  font-family: "Orbitron", sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-
-  color: #00eaff;
-  background: rgba(0, 20, 30, 0.85);
-
-  border: 1px solid rgba(0, 234, 255, 0.4);
-  border-radius: 10px;
-
-  outline: none;
-
-  box-shadow:
-    inset 0 0 10px rgba(0, 234, 255, 0.2),
-    0 0 14px rgba(0, 234, 255, 0.15);
-
-  transition: all 0.25s ease;
-}
-
-/* Glow on focus */
-.admin-password:focus {
-  border-color: #00ffff;
-  box-shadow:
-    inset 0 0 14px rgba(0, 255, 255, 0.35),
-    0 0 24px rgba(0, 255, 255, 0.5);
-}
-
-/* Placeholder cyber vibe */
 .admin-password::placeholder {
-  color: rgba(0, 234, 255, 0.5);
+  color: rgba(0,204,255,0.6);
   letter-spacing: 0.2em;
 }
 
+.admin-password:focus {
+  box-shadow:
+    0 0 20px hotpink,
+    0 0 40px rgba(255,105,180,0.8);
+  transform: scale(1.05);
+}
+
 /* =========================
-   PLAYER BOXES — CALMER
+   FIREWORKS / EMOJI
 ========================= */
 
-.player {
-  width: 100%;
-  min-height: 96px;              /* bigger */
-  padding: 18px 22px;
+#fireworks {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
 
+.emoji-rain {
+  position: fixed;
+  top: -5vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* =========================
+   ADMIN PASSWORD — FINAL FIX
+========================= */
+
+.admin-wrap {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+}
+
+/* hard reset for password input */
+.admin-password {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+
+  width: 220px;
+  height: 80px;
+
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-align: center;
 
   border-radius: 14px;
+  cursor: text;
 
-  background: rgba(10, 18, 26, 0.9);
-  border: 1px solid rgba(0, 200, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(0,180,255,0.35),
+    rgba(0,80,160,0.25)
+  );
 
+  color: #00ccff;
+  box-shadow: 0 0 30px rgba(0,180,255,0.9);
+
+  caret-color: hotpink;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.admin-password::placeholder {
+  color: rgba(0,204,255,0.6);
+  letter-spacing: 0.2em;
+}
+
+.admin-password:focus {
+  transform: scale(1.05);
   box-shadow:
-    0 0 6px rgba(0, 200, 255, 0.12);   /* MUCH calmer */
-
-  transition: all 0.25s ease;
+    0 0 20px hotpink,
+    0 0 40px rgba(255,105,180,0.8);
 }
 
-
-body.game {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* =========================
-   CURRENT PLAYER (API-DRIVEN)
-========================= */
-
-#players .player.current-player {
-  border: 3px solid hotpink;
-  box-shadow:
-    0 0 12px hotpink,
-    0 0 28px rgba(255, 105, 180, 0.9);
+#adminPassword {
+  background: red !important;
+  border: 10px solid yellow !important;
+  color: black !important;
 }
