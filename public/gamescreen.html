@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<meta http-equiv="refresh" content="1">
 
 <head>
+
+  <script>
+    setInterval(() => {
+      location.reload();
+    }, 1000); 
+  </script>
+
   <script type="module" src="/api.js"></script>
   <meta charset="UTF-8" />
-  <title>Killer Pool — Game</title>
 
   <!-- REQUIRED: CSS -->
   <link rel="stylesheet" href="/style.css" />
@@ -17,27 +22,16 @@
 <!-- REQUIRED: body MUST have class="game" -->
 
 <body class="game">
+  <canvas id="fireworks"></canvas>
 
   <div class="app">
-    <h1>Killer Pool</h1>
-
-    <!-- PLAYERS -->
-    <div class="game">
-      <div id="players"></div>
-    </div>
-    <!-- <section>
-    <h2>Selected Players</h2>
-      <div id="selectedPlayers"></div>
-    </section> -->
+    <div id="players"></div>
 
   </div>
 
-  <!-- FIREWORKS CANVAS (MUST EXIST, MUST BE LAST IN BODY) -->
-  <canvas id="fireworks"></canvas>
 
-  <!-- REQUIRED: GAME LOGIC -->
   <script src="/game.js"></script>
-
 </body>
+
 
 </html>

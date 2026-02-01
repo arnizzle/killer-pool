@@ -15,6 +15,29 @@ body {
 }
 
 /* =========================
+   LOBBY BACKGROUND (INDEX)
+========================= */
+
+body:not(.game) {
+  background-image: url("/assets/lobby-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+
+body:not(.game)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: -1;
+}
+
+
+
+/* =========================
    APP GRID
 ========================= */
 
