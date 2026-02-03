@@ -1,12 +1,23 @@
+
+// server.js (TOP OF FILE)
+
+require("dotenv").config();
+
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 const app = express();
+const { startNewGame, logAction } = require("./actionLogger");
+const { sendHAEvent } = require("./haClient");
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 app.use("/public/", express.static(path.join(__dirname, "assets")));
+
+
+let currentGameId = null;
+let actionSequence = 0;
 
 /* ======================
    STATE
@@ -136,6 +147,9 @@ app.post("/api/players/remove", (req, res) => {
 });
 
 app.post("/api/action", (req, res) => {
+
+  console.log("api/action");
+
   if (!gameStarted || gameOver) {
     return res.status(409).send("Game not active");
   }
@@ -148,12 +162,25 @@ app.post("/api/action", (req, res) => {
     return res.json({ ok: true });
   }
 
-  if (type === "miss") {
-    player.misses++;
-    if (player.misses >= 3) {
-      player.eliminated = true;
-    }
+if (type === "miss") {
+  player.misses++;
+
+  // 📝 Log the miss
+  logAction({
+    player,
+    action: "miss"
+  });
+
+  if (player.misses >= 3) {
+    player.eliminated = true;
+
+    // ☠️ Log the elimination as a distinct event
+    logAction({
+      player,
+      action: "eliminated"
+    });
   }
+}
 
   checkGameOver();
   if (!gameOver) advanceTurn();
@@ -204,22 +231,28 @@ app.post("/api/game/start", (req, res) => {
 
 app.get("/api/state", (req, res) => {
   res.json({
+    // 🔑 NEW — identifies this game for replay
+    gameId: currentGameId,
+
+    // Existing fields
     players: selectedPlayers,
     gameStarted,
     gameOver,
 
-    // EXISTING FIELD (unchanged)
+    // EXISTING FIELD (unchanged — name string)
     currentPlayer:
       selectedPlayers[currentIndex] && !gameOver
         ? selectedPlayers[currentIndex].name
         : null,
 
-    // ✅ ADDED FIELD
+    // ✅ ADDED FIELD (ID-based, for UI + logging)
     currentPlayerId: getCurrentPlayerId(),
 
+    // Winner (null until gameOver)
     winner: winner ? winner.name : null
   });
 });
+
 
 app.post("/api/players/select", (req, res) => {
   const { id } = req.body;

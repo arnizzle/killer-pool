@@ -61,7 +61,10 @@ async function load() {
 async function newGame() {
   const passwordInput = document.getElementById("adminPassword");
   const password = passwordInput ? passwordInput.value : "";
+  const gameId = `game_${Date.now()}`;
 
+  startNewGame(gameId);
+  
   const res = await fetch("/api/admin/newgame", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -100,8 +103,6 @@ function teleportKnownToSelected(playerId) {
 }
 
 async function loadKnownPlayers() {
-  console.log("Loadinging players");
-
   const res = await fetch("/api/players/known");
   const text = await res.text();
 
